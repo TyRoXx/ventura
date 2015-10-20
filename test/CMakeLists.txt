@@ -1,5 +1,5 @@
 #Boost.Test uses typeid for no reason
-if(NOT SILICIUM_NO_RTTI)
+if(NOT VENTURA_NO_RTTI)
 	include_directories(.)
 	file(GLOB sources "*.hpp" "*.cpp" "../ventura_tests/*.cpp")
 	file(GLOB_RECURSE headers "../ventura/*.hpp")
