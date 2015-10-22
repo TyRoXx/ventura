@@ -3,7 +3,7 @@
 #include <silicium/sink/append.hpp>
 #include <ventura/open.hpp>
 #include <ventura/source/file_source.hpp>
-#include <silicium/posix/pipe.hpp>
+#include <silicium/pipe.hpp>
 #include <ventura/absolute_path.hpp>
 #include <silicium/throw_last_error.hpp>
 #include <boost/test/unit_test.hpp>

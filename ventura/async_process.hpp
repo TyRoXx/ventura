@@ -6,7 +6,7 @@
 #include <ventura/process_parameters.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/process_handle.hpp>
-#include <silicium/posix/pipe.hpp>
+#include <silicium/pipe.hpp>
 #include <silicium/observable/virtualized.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/spawn_observable.hpp>
