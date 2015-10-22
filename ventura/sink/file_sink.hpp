@@ -15,14 +15,14 @@
 #endif
 
 #ifdef __APPLE__
-#	define SILICIUM_HAS_FILE_SINK 0
+#	define VENTURA_HAS_FILE_SINK 0
 #else
-#	define SILICIUM_HAS_FILE_SINK SILICIUM_HAS_VARIANT
+#	define VENTURA_HAS_FILE_SINK SILICIUM_HAS_VARIANT
 #endif
 
 namespace ventura
 {
-#if SILICIUM_HAS_FILE_SINK
+#if VENTURA_HAS_FILE_SINK
 	struct seek_set
 	{
 		boost::uint64_t from_beginning;

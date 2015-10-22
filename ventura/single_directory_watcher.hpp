@@ -6,7 +6,7 @@
 #elif defined(__linux__)
 #	include <ventura/linux/single_directory_watcher.hpp>
 #else
-#	define SILICIUM_HAS_SINGLE_DIRECTORY_WATCHER 0
+#	define VENTURA_HAS_SINGLE_DIRECTORY_WATCHER 0
 #endif
 
 #endif

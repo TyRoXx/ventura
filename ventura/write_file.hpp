@@ -6,7 +6,7 @@
 #include <ventura/sink/file_sink.hpp>
 #include <silicium/sink/append.hpp>
 
-#define VENTURA_HAS_WRITE_FILE SILICIUM_HAS_FILE_SINK
+#define VENTURA_HAS_WRITE_FILE VENTURA_HAS_FILE_SINK
 
 namespace ventura
 {

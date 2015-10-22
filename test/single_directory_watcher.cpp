@@ -139,7 +139,7 @@ namespace Si
 	}
 
 
-#if SILICIUM_HAS_FILE_SINK
+#if VENTURA_HAS_FILE_SINK
 	BOOST_AUTO_TEST_CASE(file_system_watcher_change_on_write)
 	{
 		ventura::absolute_path const watched_dir = ventura::get_current_working_directory(Si::throw_);

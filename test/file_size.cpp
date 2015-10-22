@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(file_size_empty)
 	BOOST_CHECK_EQUAL(Si::make_optional<boost::uint64_t>(0), ventura::file_size(handle.handle).get());
 }
 
-#if SILICIUM_HAS_FILE_SINK
+#if VENTURA_HAS_FILE_SINK
 BOOST_AUTO_TEST_CASE(file_size_non_empty)
 {
 	auto const file = test_root() / "file_size_non_empty.txt";

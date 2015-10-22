@@ -14,7 +14,7 @@
 #	include <boost/filesystem/operations.hpp>
 #endif
 
-#if SILICIUM_HAS_EXCEPTIONS && SILICIUM_HAS_FILE_SINK //for Boost filesystem
+#if SILICIUM_HAS_EXCEPTIONS && VENTURA_HAS_FILE_SINK //for Boost filesystem
 namespace
 {
 	std::vector<char> read_file(boost::filesystem::path const &name)
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(file_sink_success)
 }
 #endif
 
-#if SILICIUM_HAS_FILE_SINK
+#if VENTURA_HAS_FILE_SINK
 namespace
 {
 	ventura::absolute_path get_readonly_file()
