@@ -163,8 +163,8 @@ namespace ventura
 	{
 #ifdef _WIN32
 		boost::ignore_unused_variable_warning(output);
-		auto to_double_zero = detail::double_zero_terminate(to.to_boost_path().native());
-		auto from_double_zero = detail::double_zero_terminate(from.to_boost_path().native());
+		std::vector<wchar_t> to_double_zero = detail::double_zero_terminate(to.to_boost_path().native());
+		std::vector<wchar_t> from_double_zero = detail::double_zero_terminate(from.to_boost_path().native());
 		SHFILEOPSTRUCTW s = {0};
 		s.hwnd = ::GetConsoleWindow();
 		s.wFunc = FO_COPY;
@@ -238,8 +238,8 @@ namespace ventura
 		std::vector<wchar_t> buffer(MAX_PATH);
 		for (;;)
 		{
-			auto const length = GetModuleFileNameW(NULL, buffer.data(), buffer.size());
-			auto const ec = Si::get_last_error();
+			DWORD const length = GetModuleFileNameW(NULL, buffer.data(), buffer.size());
+			boost::system::error_code const ec = Si::get_last_error();
 			switch (ec.value())
 			{
 			case ERROR_INSUFFICIENT_BUFFER:
@@ -258,7 +258,7 @@ namespace ventura
 		}
 #elif defined(__linux__)
 		boost::system::error_code ec;
-		auto result = boost::filesystem::read_symlink("/proc/self/exe", ec);
+		boost::filesystem::path result = boost::filesystem::read_symlink("/proc/self/exe", ec);
 		if (!!ec)
 		{
 			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<absolute_path>());
@@ -286,7 +286,7 @@ namespace ventura
 	                                                         Si::identity<absolute_path>()))
 	{
 		boost::system::error_code ec;
-		auto temp = boost::filesystem::temp_directory_path(ec);
+		boost::filesystem::path temp = boost::filesystem::temp_directory_path(ec);
 		if (!!ec)
 		{
 			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<absolute_path>());
