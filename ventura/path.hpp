@@ -221,7 +221,7 @@ namespace ventura
 namespace std
 {
 	template <>
-	struct hash<::ventura::path>
+	struct hash<ventura::path>
 	{
 		std::size_t operator()(ventura::path const &value) const
 		{

@@ -310,7 +310,7 @@ namespace ventura
 namespace std
 {
 	template <>
-	struct hash<::ventura::absolute_path>
+	struct hash<ventura::absolute_path>
 	{
 		SILICIUM_USE_RESULT
 		std::size_t operator()(ventura::absolute_path const &value) const

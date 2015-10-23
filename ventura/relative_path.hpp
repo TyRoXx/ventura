@@ -228,7 +228,7 @@ namespace ventura
 namespace std
 {
 	template <>
-	struct hash<::ventura::relative_path>
+	struct hash<ventura::relative_path>
 	{
 		SILICIUM_USE_RESULT
 		std::size_t operator()(ventura::relative_path const &value) const
