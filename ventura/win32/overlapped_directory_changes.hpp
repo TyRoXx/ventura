@@ -41,7 +41,7 @@ namespace ventura
 			    , io(&io)
 			    , receiver_(nullptr)
 			    , received(0)
-			    , watch_file(CreateFileW(watched.c_str(), FILE_LIST_DIRECTORY,
+			    , watch_file(CreateFileW(to_os_string(watched).c_str(), FILE_LIST_DIRECTORY,
 			                             FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
 			                             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL))
 			{

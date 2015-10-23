@@ -8,16 +8,12 @@
 
 namespace ventura
 {
+	typedef char path_char;
+
 	struct path
 	{
-		typedef native_path_char char_type;
-		typedef
-#ifdef _WIN32
-		    boost::filesystem::path
-#else
-		    Si::noexcept_string
-#endif
-		        underlying_type;
+		typedef path_char char_type;
+		typedef Si::noexcept_string underlying_type;
 
 		path() BOOST_NOEXCEPT
 		{
@@ -26,55 +22,43 @@ namespace ventura
 		explicit path(Si::noexcept_string const &value)
 		    : m_value(value)
 		{
+			normalize_slashes();
+		}
+
+		explicit path(Si::noexcept_string &&value)
+		    : m_value(std::move(value))
+		{
+			normalize_slashes();
 		}
 
 		explicit path(boost::filesystem::path const &value)
-#ifdef _WIN32
-		    : m_value(value)
-#else
-		    : m_value(value.c_str())
-#endif
+		    : m_value(value.string().c_str())
 		{
+			normalize_slashes();
 		}
 
 		explicit path(char_type const *c_str)
 		    : m_value(c_str)
 		{
+			normalize_slashes();
 		}
 
 		template <std::size_t N>
 		explicit path(char_type const(&c_str_literal)[N])
 		    : m_value(c_str_literal)
 		{
+			normalize_slashes();
 		}
-
-#ifdef _WIN32
-		explicit path(char const *c_str)
-		    : m_value(c_str)
-		{
-		}
-
-		template <std::size_t N>
-		explicit path(char const(&c_str_literal)[N])
-		    : m_value(c_str_literal)
-		{
-		}
-#endif
 
 		template <class Iterator>
 		path(Iterator begin, Iterator end)
 		    : m_value(begin, end)
 		{
+			normalize_slashes();
 		}
 
-		path(path &&other) BOOST_NOEXCEPT
-#ifndef _WIN32
-		    : m_value(std::move(other.m_value))
-#endif
+		path(path &&other) BOOST_NOEXCEPT : m_value(std::move(other.m_value))
 		{
-#ifdef _WIN32
-			m_value.swap(other.m_value);
-#endif
 		}
 
 		path(path const &other)
@@ -84,11 +68,7 @@ namespace ventura
 
 		path &operator=(path &&other) BOOST_NOEXCEPT
 		{
-#ifdef _WIN32
-			m_value.swap(other.m_value);
-#else
 			m_value = std::move(other.m_value);
-#endif
 			return *this;
 		}
 
@@ -103,25 +83,12 @@ namespace ventura
 			m_value.swap(other.m_value);
 		}
 
-		boost::filesystem::path
-#ifdef _WIN32
-		    const &
-#endif
-		    to_boost_path() const
+		boost::filesystem::path to_boost_path() const
 		{
-			return m_value
-#ifndef _WIN32
-			    .c_str()
-#endif
-			    ;
+			return m_value.c_str();
 		}
 
-#ifdef _WIN32
-		boost::filesystem::path const &
-#else
-		Si::noexcept_string const &
-#endif
-		underlying() const BOOST_NOEXCEPT
+		underlying_type const &underlying() const BOOST_NOEXCEPT
 		{
 			return m_value;
 		}
@@ -138,6 +105,11 @@ namespace ventura
 
 	private:
 		underlying_type m_value;
+
+		void normalize_slashes()
+		{
+			std::replace(m_value.begin(), m_value.end(), '\\', '/');
+		}
 	};
 
 #if SILICIUM_HAS_IS_HANDLE

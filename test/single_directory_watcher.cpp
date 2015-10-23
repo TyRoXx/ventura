@@ -139,7 +139,8 @@ namespace Si
 		ventura::absolute_path const test_file = watched_dir / "test.txt";
 
 		boost::filesystem::create_directories(watched_dir.to_boost_path());
-		Si::file_handle file = ventura::overwrite_file(Si::native_path_string(test_file.c_str())).move_value();
+		Si::file_handle file =
+		    ventura::overwrite_file(Si::native_path_string(to_os_string(test_file).c_str())).move_value();
 
 		test_single_event(watched_dir,
 		                  [&file]
@@ -193,7 +194,7 @@ namespace Si
 		touch(test_file);
 
 #ifdef _WIN32
-		BOOST_REQUIRE(SetFileAttributesW(test_file.c_str(), FILE_ATTRIBUTE_NORMAL));
+		BOOST_REQUIRE(SetFileAttributesW(to_os_string(test_file).c_str(), FILE_ATTRIBUTE_NORMAL));
 #else
 		BOOST_REQUIRE(!chmod(test_file.c_str(), 0555));
 #endif
@@ -202,7 +203,8 @@ namespace Si
 		                  [&test_file]
 		                  {
 #ifdef _WIN32
-			                  BOOST_REQUIRE(SetFileAttributesW(test_file.c_str(), FILE_ATTRIBUTE_TEMPORARY));
+			                  BOOST_REQUIRE(
+			                      SetFileAttributesW(to_os_string(test_file).c_str(), FILE_ATTRIBUTE_TEMPORARY));
 #else
 			                  BOOST_REQUIRE(!chmod(test_file.c_str(), 0755));
 #endif

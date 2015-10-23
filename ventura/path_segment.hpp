@@ -9,7 +9,7 @@ namespace ventura
 {
 	struct path_segment
 	{
-		typedef native_path_char char_type;
+		typedef path_char char_type;
 
 		path_segment() BOOST_NOEXCEPT
 		{
@@ -41,21 +41,12 @@ namespace ventura
 			m_value.swap(other.m_value);
 		}
 
-		boost::filesystem::path
-#ifdef _WIN32
-		    const &
-#endif
-		    to_boost_path() const
+		boost::filesystem::path to_boost_path() const
 		{
 			return m_value.to_boost_path();
 		}
 
-#ifdef _WIN32
-		boost::filesystem::path const &
-#else
-		Si::noexcept_string const &
-#endif
-		underlying() const BOOST_NOEXCEPT
+		path::underlying_type const &underlying() const BOOST_NOEXCEPT
 		{
 			return m_value.underlying();
 		}

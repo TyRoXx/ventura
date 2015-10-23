@@ -9,7 +9,7 @@ namespace ventura
 {
 	struct relative_path
 	{
-		typedef native_path_char char_type;
+		typedef path_char char_type;
 
 		relative_path() BOOST_NOEXCEPT
 		{
@@ -26,11 +26,7 @@ namespace ventura
 		}
 
 		explicit relative_path(boost::filesystem::path const &value)
-#ifdef _WIN32
-		    : m_value(value)
-#else
-		    : m_value(value.c_str())
-#endif
+		    : m_value(value.string().c_str())
 		{
 		}
 
@@ -44,19 +40,6 @@ namespace ventura
 		    : m_value(c_str_literal)
 		{
 		}
-
-#ifdef _WIN32
-		explicit relative_path(char const *c_str)
-		    : m_value(c_str)
-		{
-		}
-
-		template <std::size_t N>
-		explicit relative_path(char const(&c_str_literal)[N])
-		    : m_value(c_str_literal)
-		{
-		}
-#endif
 
 		template <class Iterator>
 		relative_path(Iterator begin, Iterator end)
@@ -91,22 +74,13 @@ namespace ventura
 		}
 
 		SILICIUM_USE_RESULT
-		boost::filesystem::path
-#ifdef _WIN32
-		    const &
-#endif
-		    to_boost_path() const
+		boost::filesystem::path to_boost_path() const
 		{
 			return m_value.to_boost_path();
 		}
 
 		SILICIUM_USE_RESULT
-#ifdef _WIN32
-		boost::filesystem::path const &
-#else
-		Si::noexcept_string const &
-#endif
-		underlying() const BOOST_NOEXCEPT
+		path::underlying_type const &underlying() const BOOST_NOEXCEPT
 		{
 			return m_value.underlying();
 		}

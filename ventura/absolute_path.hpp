@@ -13,14 +13,13 @@
 #ifdef _WIN32
 #include <silicium/win32/win32.hpp>
 #endif
-
 #include <iostream>
 
 namespace ventura
 {
 	struct absolute_path
 	{
-		typedef native_path_char char_type;
+		typedef path_char char_type;
 		typedef path::underlying_type underlying_type;
 
 		absolute_path() BOOST_NOEXCEPT
@@ -54,22 +53,13 @@ namespace ventura
 		}
 
 		SILICIUM_USE_RESULT
-		boost::filesystem::path
-#ifdef _WIN32
-		    const &
-#endif
-		    to_boost_path() const
+		boost::filesystem::path to_boost_path() const
 		{
 			return m_value.to_boost_path();
 		}
 
 		SILICIUM_USE_RESULT
-#ifdef _WIN32
-		boost::filesystem::path const &
-#else
-		Si::noexcept_string const &
-#endif
-		underlying() const BOOST_NOEXCEPT
+		path::underlying_type const &underlying() const BOOST_NOEXCEPT
 		{
 			return m_value.underlying();
 		}
@@ -81,9 +71,9 @@ namespace ventura
 		}
 
 		SILICIUM_USE_RESULT
-		Si::native_path_string safe_c_str() const BOOST_NOEXCEPT
+		Si::c_string safe_c_str() const BOOST_NOEXCEPT
 		{
-			return Si::native_path_string(c_str());
+			return Si::c_string(c_str());
 		}
 
 		void combine(relative_path const &back)
@@ -270,14 +260,6 @@ namespace ventura
 	{
 		return front / relative_path(boost::filesystem::path(&literal[0]));
 	}
-
-#ifdef _WIN32
-	template <std::size_t N>
-	SILICIUM_USE_RESULT inline absolute_path operator/(absolute_path const &front, char const(&literal)[N])
-	{
-		return front / relative_path(boost::filesystem::path(&literal[0]));
-	}
-#endif
 
 	inline absolute_path operator/(absolute_path const &front, path_segment const &back)
 	{

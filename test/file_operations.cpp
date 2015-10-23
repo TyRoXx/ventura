@@ -82,8 +82,8 @@ BOOST_AUTO_TEST_CASE(test_get_home)
 {
 	ventura::absolute_path const home = ventura::get_home();
 #ifdef _WIN32
-	BOOST_CHECK(boost::algorithm::starts_with(to_os_string(home), L"C:\\Users\\"));
-	BOOST_CHECK(boost::algorithm::ends_with(to_os_string(home), L"\\AppData\\Local"));
+	BOOST_CHECK(boost::algorithm::starts_with(to_os_string(home), "C:/Users/"));
+	BOOST_CHECK(boost::algorithm::ends_with(to_os_string(home), "/AppData/Local"));
 #elif defined(__linux__)
 	BOOST_CHECK(boost::algorithm::starts_with(ventura::to_os_string(home), "/home/"));
 #else
@@ -101,7 +101,8 @@ BOOST_AUTO_TEST_CASE(test_copy_recursively)
 	ventura::absolute_path const to = temp / ventura::relative_path("to");
 	ventura::create_directories(from, Si::throw_);
 	auto const expected = Si::make_c_str_range("Hello");
-	Si::throw_if_error(ventura::write_file((from / ventura::relative_path("file.txt")).safe_c_str(), expected));
+	Si::throw_if_error(ventura::write_file(
+	    Si::native_path_string(to_os_string(from / ventura::relative_path("file.txt")).c_str()), expected));
 	ventura::copy_recursively(from, to, nullptr, Si::throw_);
 	std::ifstream file((to / ventura::relative_path("file.txt")).c_str(), std::ios::binary);
 	BOOST_REQUIRE(file);

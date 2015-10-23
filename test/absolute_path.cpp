@@ -6,14 +6,14 @@
 #include <map>
 
 #ifdef _WIN32
-#define SILICIUM_TEST_ROOT L"C:/"
+#define SILICIUM_TEST_ROOT "C:/"
 #else
 #define SILICIUM_TEST_ROOT "/"
 #endif
 
 namespace
 {
-	Si::os_string const absolute_root(SILICIUM_TEST_ROOT);
+	Si::noexcept_string const absolute_root(SILICIUM_TEST_ROOT);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_empty)
@@ -132,28 +132,28 @@ BOOST_AUTO_TEST_CASE(absolute_path_combine)
 BOOST_AUTO_TEST_CASE(absolute_path_c_str_empty)
 {
 	ventura::absolute_path p;
-	ventura::native_path_char const *c_str = p.c_str();
-	BOOST_CHECK(std::basic_string<ventura::native_path_char>("") == c_str);
+	char const *c_str = p.c_str();
+	BOOST_CHECK(std::string("") == c_str);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_c_str_non_empty)
 {
 	ventura::absolute_path p = *ventura::absolute_path::create(absolute_root);
-	ventura::native_path_char const *c_str = p.c_str();
+	char const *c_str = p.c_str();
 	BOOST_CHECK(absolute_root == c_str);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_safe_c_str_empty)
 {
 	ventura::absolute_path p;
-	Si::native_path_string const str = p.safe_c_str();
-	BOOST_CHECK(std::basic_string<ventura::native_path_char>("") == str.c_str());
+	Si::c_string const str = p.safe_c_str();
+	BOOST_CHECK(std::string("") == str.c_str());
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_safe_c_str_non_empty)
 {
 	ventura::absolute_path p = *ventura::absolute_path::create(absolute_root);
-	Si::native_path_string const str = p.safe_c_str();
+	Si::c_string const str = p.safe_c_str();
 	BOOST_CHECK(absolute_root == str.c_str());
 }
 

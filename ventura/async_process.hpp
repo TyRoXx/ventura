@@ -139,6 +139,14 @@ namespace ventura
 			}
 			return command_line;
 		}
+
+		inline Si::os_string to_create_process_path(absolute_path const &path)
+		{
+			Si::os_string result = to_os_string(path);
+			// wow, CreateProcessW does not work with slashes
+			std::replace(result.begin(), result.end(), L'/', L'\\');
+			return result;
+		}
 	}
 
 	inline Si::error_or<async_process>
@@ -148,7 +156,7 @@ namespace ventura
 	               environment_inheritance inheritance)
 	{
 		std::vector<Si::os_string> all_arguments;
-		all_arguments.emplace_back(L"\"" + parameters.executable.underlying().wstring() + L"\"");
+		all_arguments.emplace_back(L"\"" + detail::to_create_process_path(parameters.executable) + L"\"");
 		all_arguments.insert(all_arguments.end(), parameters.arguments.begin(), parameters.arguments.end());
 		Si::win32::winapi_string command_line = detail::build_command_line(all_arguments);
 
@@ -262,9 +270,9 @@ namespace ventura
 		}
 
 		PROCESS_INFORMATION process = {};
-		if (!CreateProcessW(parameters.executable.c_str(), &command_line[0], &security, nullptr, TRUE, flags,
-		                    environment_block.empty() ? NULL : environment_block.data(),
-		                    parameters.current_path.c_str(), &startup, &process))
+		if (!CreateProcessW(detail::to_create_process_path(parameters.executable).c_str(), &command_line[0], &security,
+		                    nullptr, TRUE, flags, environment_block.empty() ? NULL : environment_block.data(),
+		                    detail::to_create_process_path(parameters.current_path).c_str(), &startup, &process))
 		{
 			return Si::get_last_error();
 		}

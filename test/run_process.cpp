@@ -61,7 +61,7 @@ namespace Si
 	BOOST_AUTO_TEST_CASE(run_process_from_nonexecutable)
 	{
 		ventura::process_parameters parameters;
-		parameters.executable = absolute_root / SILICIUM_SYSTEM_LITERAL("does-not-exist");
+		parameters.executable = absolute_root / "does-not-exist";
 		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
 		BOOST_CHECK_EXCEPTION(
 		    ventura::run_process(parameters), boost::system::system_error, [](boost::system::system_error const &e)

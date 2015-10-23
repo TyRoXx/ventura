@@ -144,6 +144,8 @@ namespace ventura
 		std::vector<wchar_t> double_zero_terminate(String const &str)
 		{
 			std::vector<wchar_t> result(str.begin(), str.end());
+			// wow, SHFileOperationW does not work with slashes
+			std::replace(result.begin(), result.end(), L'/', L'\\');
 			result.push_back(0);
 			result.push_back(0);
 			return result;
