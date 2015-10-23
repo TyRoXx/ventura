@@ -6,9 +6,9 @@
 #include <map>
 
 #ifdef _WIN32
-#	define SILICIUM_TEST_ROOT L"C:/"
+#define SILICIUM_TEST_ROOT L"C:/"
 #else
-#	define SILICIUM_TEST_ROOT "/"
+#define SILICIUM_TEST_ROOT "/"
 #endif
 
 namespace
@@ -25,45 +25,47 @@ BOOST_AUTO_TEST_CASE(absolute_path_empty)
 
 BOOST_AUTO_TEST_CASE(absolute_path_copy_construction)
 {
-	ventura::absolute_path b = *ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
+	ventura::absolute_path b = *ventura::absolute_path::create(absolute_root + "b");
 	ventura::absolute_path a(b);
 	BOOST_CHECK_EQUAL(a, b);
-	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == a);
-	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == b);
+	BOOST_CHECK(absolute_root + "b" == a);
+	BOOST_CHECK(absolute_root + "b" == b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_copy_assignment)
 {
-	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
+	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b");
 	BOOST_CHECK_NE(a, b);
 	a = b;
 	BOOST_CHECK_EQUAL(a, b);
-	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == a);
-	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == b);
+	BOOST_CHECK(absolute_root + "b" == a);
+	BOOST_CHECK(absolute_root + "b" == b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_move_construction)
 {
-	ventura::absolute_path b = *ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
+	ventura::absolute_path b = *ventura::absolute_path::create(absolute_root + "b");
 	ventura::absolute_path a(std::move(b));
 	BOOST_CHECK_NE(a, b);
-	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == a);
+	BOOST_CHECK(absolute_root + "b" == a);
 	BOOST_CHECK_EQUAL("", b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_move_assignment)
 {
-	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
+	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b");
 	BOOST_CHECK_NE(a, b);
 	a = std::move(b);
 	BOOST_CHECK_NE(a, b);
-	BOOST_CHECK(absolute_root + SILICIUM_SYSTEM_LITERAL("b") == a);
+	BOOST_CHECK(absolute_root + "b" == a);
 	BOOST_CHECK_EQUAL("", b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_equality)
 {
-	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b")), c = *ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("c")), c2 = *ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("c"));
+	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b"),
+	                          c = *ventura::absolute_path::create(absolute_root + "c"),
+	                          c2 = *ventura::absolute_path::create(absolute_root + "c");
 	BOOST_CHECK_EQUAL(a, a);
 	BOOST_CHECK_EQUAL(b, b);
 	BOOST_CHECK_EQUAL(c, c);
@@ -79,11 +81,11 @@ BOOST_AUTO_TEST_CASE(absolute_path_equality)
 
 BOOST_AUTO_TEST_CASE(absolute_path_equality_with_other_types)
 {
-	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
+	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b");
 	BOOST_CHECK_EQUAL(a, "");
 	BOOST_CHECK_EQUAL(a, boost::filesystem::path());
-	BOOST_CHECK(b == absolute_root + SILICIUM_SYSTEM_LITERAL("b"));
-	BOOST_CHECK(b == boost::filesystem::path((absolute_root + SILICIUM_SYSTEM_LITERAL("b")).c_str()));
+	BOOST_CHECK(b == absolute_root + "b");
+	BOOST_CHECK(b == boost::filesystem::path((absolute_root + "b").c_str()));
 	BOOST_CHECK_NE(a, "x");
 	BOOST_CHECK_NE(a, boost::filesystem::path("x"));
 }
@@ -93,13 +95,13 @@ namespace
 	template <class Map>
 	void test_map(Map &m)
 	{
-		m[*ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("a"))] = 1;
-		m[*ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"))] = 2;
-		m[*ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("c"))] = 3;
+		m[*ventura::absolute_path::create(absolute_root + "a")] = 1;
+		m[*ventura::absolute_path::create(absolute_root + "b")] = 2;
+		m[*ventura::absolute_path::create(absolute_root + "c")] = 3;
 		BOOST_CHECK_EQUAL(3u, m.size());
-		BOOST_CHECK_EQUAL(1, m[*ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("a"))]);
-		BOOST_CHECK_EQUAL(2, m[*ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("b"))]);
-		BOOST_CHECK_EQUAL(3, m[*ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("c"))]);
+		BOOST_CHECK_EQUAL(1, m[*ventura::absolute_path::create(absolute_root + "a")]);
+		BOOST_CHECK_EQUAL(2, m[*ventura::absolute_path::create(absolute_root + "b")]);
+		BOOST_CHECK_EQUAL(3, m[*ventura::absolute_path::create(absolute_root + "c")]);
 	}
 }
 
@@ -123,14 +125,15 @@ BOOST_AUTO_TEST_CASE(absolute_path_boost_hash)
 
 BOOST_AUTO_TEST_CASE(absolute_path_combine)
 {
-	BOOST_CHECK_EQUAL(*ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("a/b")), *ventura::absolute_path::create(absolute_root + SILICIUM_SYSTEM_LITERAL("a")) / ventura::relative_path("b"));
+	BOOST_CHECK_EQUAL(*ventura::absolute_path::create(absolute_root + "a/b"),
+	                  *ventura::absolute_path::create(absolute_root + "a") / ventura::relative_path("b"));
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_c_str_empty)
 {
 	ventura::absolute_path p;
 	ventura::native_path_char const *c_str = p.c_str();
-	BOOST_CHECK(std::basic_string<ventura::native_path_char>(SILICIUM_SYSTEM_LITERAL("")) == c_str);
+	BOOST_CHECK(std::basic_string<ventura::native_path_char>("") == c_str);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_c_str_non_empty)
@@ -144,7 +147,7 @@ BOOST_AUTO_TEST_CASE(absolute_path_safe_c_str_empty)
 {
 	ventura::absolute_path p;
 	Si::native_path_string const str = p.safe_c_str();
-	BOOST_CHECK(std::basic_string<ventura::native_path_char>(SILICIUM_SYSTEM_LITERAL("")) == str.c_str());
+	BOOST_CHECK(std::basic_string<ventura::native_path_char>("") == str.c_str());
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_safe_c_str_non_empty)
@@ -184,7 +187,8 @@ BOOST_AUTO_TEST_CASE(absolute_path_create_noexcept_string_not_ok)
 
 BOOST_AUTO_TEST_CASE(absolute_path_create_boost_path_ok)
 {
-	Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(boost::filesystem::path(SILICIUM_TEST_ROOT));
+	Si::optional<ventura::absolute_path> p =
+	    ventura::absolute_path::create(boost::filesystem::path(SILICIUM_TEST_ROOT));
 	BOOST_REQUIRE(p);
 	BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
 }
