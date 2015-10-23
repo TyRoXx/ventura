@@ -19,36 +19,31 @@ namespace ventura
 			typedef Si::error_or<std::vector<file_notification>> element_type;
 
 			overlapped_directory_changes()
-				: is_recursive(false)
-				, io(nullptr)
-				, receiver_(nullptr)
-				, received(0)
+			    : is_recursive(false)
+			    , io(nullptr)
+			    , receiver_(nullptr)
+			    , received(0)
 			{
 			}
 
 			overlapped_directory_changes(overlapped_directory_changes &&other)
-				: is_recursive(std::move(other.is_recursive))
-				, io(other.io)
-				, receiver_(other.receiver_)
-				, received(0)
-				, watch_file(std::move(other.watch_file))
+			    : is_recursive(std::move(other.is_recursive))
+			    , io(other.io)
+			    , receiver_(other.receiver_)
+			    , received(0)
+			    , watch_file(std::move(other.watch_file))
 			{
 			}
 
-			explicit overlapped_directory_changes(boost::asio::io_service &io, absolute_path const &watched, bool is_recursive)
-				: is_recursive(is_recursive)
-				, io(&io)
-				, receiver_(nullptr)
-				, received(0)
-				, watch_file(CreateFileW(
-					watched.c_str(),
-					FILE_LIST_DIRECTORY,
-					FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
-					NULL,
-					OPEN_EXISTING,
-					FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-					NULL
-				))
+			explicit overlapped_directory_changes(boost::asio::io_service &io, absolute_path const &watched,
+			                                      bool is_recursive)
+			    : is_recursive(is_recursive)
+			    , io(&io)
+			    , receiver_(nullptr)
+			    , received(0)
+			    , watch_file(CreateFileW(watched.c_str(), FILE_LIST_DIRECTORY,
+			                             FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
+			                             FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL))
 			{
 				if (watch_file.get() == INVALID_HANDLE_VALUE)
 				{
@@ -65,8 +60,7 @@ namespace ventura
 
 			~overlapped_directory_changes()
 			{
-				if (watch_file.get() == nullptr ||
-					watch_file.get() == INVALID_HANDLE_VALUE)
+				if (watch_file.get() == nullptr || watch_file.get() == INVALID_HANDLE_VALUE)
 				{
 					return;
 				}
@@ -84,7 +78,7 @@ namespace ventura
 				}
 			}
 
-			overlapped_directory_changes &operator = (overlapped_directory_changes &&other)
+			overlapped_directory_changes &operator=(overlapped_directory_changes &&other)
 			{
 				is_recursive = other.is_recursive;
 				io = other.io;
@@ -97,29 +91,36 @@ namespace ventura
 			{
 				assert(!receiver_);
 				receiver_ = receiver.get();
-				boost::asio::windows::overlapped_ptr overlapped(*io, [this](boost::system::error_code ec, std::size_t)
-				{
-					if (!!ec)
-					{
-						Si::exchange(this->receiver_, nullptr)->got_element(ec);
-						return;
-					}
-					std::vector<file_notification> notifications;
-					for (char *next_event = buffer.data();;)
-					{
-						FILE_NOTIFY_INFORMATION const &notification = reinterpret_cast<FILE_NOTIFY_INFORMATION const &>(*next_event);
-						relative_path name(notification.FileName + 0, notification.FileName + (notification.FileNameLength / sizeof(WCHAR)));
-						notifications.emplace_back(file_notification(notification.Action, std::move(name)));
-						if (0 == notification.NextEntryOffset)
-						{
-							break;
-						}
-						next_event += notification.NextEntryOffset;
-					}
-					Si::exchange(this->receiver_, nullptr)->got_element(std::move(notifications));
-				});
-				DWORD const actions = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_ATTRIBUTES;
-				bool const ok = (0 != ReadDirectoryChangesW(watch_file.get(), buffer.data(), static_cast<DWORD>(buffer.size()), is_recursive, actions, &received, overlapped.get(), nullptr));
+				boost::asio::windows::overlapped_ptr overlapped(
+				    *io, [this](boost::system::error_code ec, std::size_t)
+				    {
+					    if (!!ec)
+					    {
+						    Si::exchange(this->receiver_, nullptr)->got_element(ec);
+						    return;
+					    }
+					    std::vector<file_notification> notifications;
+					    for (char *next_event = buffer.data();;)
+					    {
+						    FILE_NOTIFY_INFORMATION const &notification =
+						        reinterpret_cast<FILE_NOTIFY_INFORMATION const &>(*next_event);
+						    relative_path name(notification.FileName + 0,
+						                       notification.FileName + (notification.FileNameLength / sizeof(WCHAR)));
+						    notifications.emplace_back(file_notification(notification.Action, std::move(name)));
+						    if (0 == notification.NextEntryOffset)
+						    {
+							    break;
+						    }
+						    next_event += notification.NextEntryOffset;
+					    }
+					    Si::exchange(this->receiver_, nullptr)->got_element(std::move(notifications));
+					});
+				DWORD const actions = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE |
+				                      FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_CREATION |
+				                      FILE_NOTIFY_CHANGE_ATTRIBUTES;
+				bool const ok =
+				    (0 != ReadDirectoryChangesW(watch_file.get(), buffer.data(), static_cast<DWORD>(buffer.size()),
+				                                is_recursive, actions, &received, overlapped.get(), nullptr));
 				if (!ok)
 				{
 					DWORD last_error = GetLastError();
@@ -133,7 +134,6 @@ namespace ventura
 			}
 
 		private:
-
 			bool is_recursive;
 			boost::asio::io_service *io;
 			Si::observer<element_type> *receiver_;

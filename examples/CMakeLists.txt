@@ -7,3 +7,6 @@ if(UNIX) #TODO: Windows
 	target_link_libraries(run_process ${Boost_LIBRARIES})
 	set_target_properties(run_process PROPERTIES FOLDER examples)
 endif()
+
+file(GLOB exampleSources "*.cpp" "*.hpp")
+set(formatted ${formatted} ${exampleSources} PARENT_SCOPE)

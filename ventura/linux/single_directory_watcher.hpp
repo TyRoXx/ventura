@@ -55,14 +55,16 @@ namespace ventura
 			return Si::none;
 		}
 
-		Si::optional<Si::error_or<ventura::file_notification>> to_portable_file_notification(linux::file_notification &&original, relative_path const &root)
+		Si::optional<Si::error_or<ventura::file_notification>>
+		to_portable_file_notification(linux::file_notification &&original, relative_path const &root)
 		{
 			auto const type = to_portable_file_notification_type(original.mask);
 			if (!type)
 			{
 				return Si::none;
 			}
-			return Si::error_or<ventura::file_notification>(ventura::file_notification(*type, root / std::move(original.name), (original.mask & IN_ISDIR) == IN_ISDIR));
+			return Si::error_or<ventura::file_notification>(ventura::file_notification(
+			    *type, root / std::move(original.name), (original.mask & IN_ISDIR) == IN_ISDIR));
 		}
 	}
 
@@ -75,9 +77,14 @@ namespace ventura
 		}
 
 		explicit single_directory_watcher(boost::asio::io_service &io, absolute_path const &watched)
-			: inotify(io)
-			, impl(Si::enumerate(Si::ref(inotify)), [](linux::file_notification &&notification) { return linux::to_portable_file_notification(std::move(notification), relative_path()); })
-			, root(Si::get(inotify.watch(watched, (IN_MODIFY | IN_CLOSE_WRITE | IN_MOVED_FROM | IN_MOVED_TO | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF | IN_ATTRIB))))
+		    : inotify(io)
+		    , impl(Si::enumerate(Si::ref(inotify)),
+		           [](linux::file_notification &&notification)
+		           {
+			           return linux::to_portable_file_notification(std::move(notification), relative_path());
+			       })
+		    , root(Si::get(inotify.watch(watched, (IN_MODIFY | IN_CLOSE_WRITE | IN_MOVED_FROM | IN_MOVED_TO |
+		                                           IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF | IN_ATTRIB))))
 		{
 		}
 
@@ -85,31 +92,28 @@ namespace ventura
 		void async_get_one(Observer &&receiver)
 		{
 			impl.async_get_one(
-				Si::function_observer<std::function<void (Si::optional<Si::error_or<file_notification>>)>>(
-					[SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))](Si::optional<Si::error_or<file_notification>> element) mutable
-					{
-						if (element)
-						{
-							std::move(receiver).got_element(std::move(*element));
-						}
-						else
-						{
-							std::move(receiver).ended();
-						}
-					}
-				)
-			);
+			    Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>(
+			        [SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))](
+			            Si::optional<Si::error_or<file_notification>> element) mutable
+			        {
+				        if (element)
+				        {
+					        std::move(receiver).got_element(std::move(*element));
+				        }
+				        else
+				        {
+					        std::move(receiver).ended();
+				        }
+				    }));
 		}
 
 	private:
-
 		linux::inotify_observable inotify;
 		Si::conditional_transformer<
-			Si::error_or<file_notification>,
-			Si::enumerator<Si::ptr_observable<std::vector<linux::file_notification>, linux::inotify_observable *>>,
-			std::function<Si::optional<Si::error_or<file_notification>>(linux::file_notification &&)>,
-			Si::function_observer<std::function<void (Si::optional<Si::error_or<file_notification>>)>>
-		> impl;
+		    Si::error_or<file_notification>,
+		    Si::enumerator<Si::ptr_observable<std::vector<linux::file_notification>, linux::inotify_observable *>>,
+		    std::function<Si::optional<Si::error_or<file_notification>>(linux::file_notification &&)>,
+		    Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>> impl;
 		linux::watch_descriptor root;
 	};
 #endif

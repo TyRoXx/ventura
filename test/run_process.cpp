@@ -6,7 +6,7 @@
 #include <silicium/source/range_source.hpp>
 #include <boost/test/unit_test.hpp>
 #if VENTURA_HAS_RUN_PROCESS
-#	include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/operations.hpp>
 #endif
 
 namespace Si
@@ -50,12 +50,12 @@ namespace Si
 	namespace
 	{
 		ventura::absolute_path const absolute_root = *ventura::absolute_path::create(
-	#ifdef _WIN32
-			L"C:/"
-	#else
-			"/"
-	#endif
-		);
+#ifdef _WIN32
+		    L"C:/"
+#else
+		    "/"
+#endif
+		    );
 	}
 
 	BOOST_AUTO_TEST_CASE(run_process_from_nonexecutable)
@@ -63,10 +63,11 @@ namespace Si
 		ventura::process_parameters parameters;
 		parameters.executable = absolute_root / SILICIUM_SYSTEM_LITERAL("does-not-exist");
 		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
-		BOOST_CHECK_EXCEPTION(ventura::run_process(parameters), boost::system::system_error, [](boost::system::system_error const &e)
-		{
-			return e.code() == boost::system::error_code(ENOENT, boost::system::system_category());
-		});
+		BOOST_CHECK_EXCEPTION(
+		    ventura::run_process(parameters), boost::system::system_error, [](boost::system::system_error const &e)
+		    {
+			    return e.code() == boost::system::error_code(ENOENT, boost::system::system_category());
+			});
 	}
 
 #ifndef _WIN32

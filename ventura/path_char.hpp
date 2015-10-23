@@ -7,11 +7,11 @@ namespace ventura
 {
 	typedef
 #ifdef _WIN32
-		wchar_t
+	    wchar_t
 #else
-		char
+	    char
 #endif
-		native_path_char;
+	        native_path_char;
 
 	BOOST_STATIC_ASSERT(Si::is_handle<native_path_char>::value);
 }

@@ -14,13 +14,13 @@ namespace ventura
 			relative_path name;
 
 			file_notification()
-				: action(0)
+			    : action(0)
 			{
 			}
 
 			file_notification(DWORD action, relative_path name)
-				: action(action)
-				, name(std::move(name))
+			    : action(action)
+			    , name(std::move(name))
 			{
 			}
 		};

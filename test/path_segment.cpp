@@ -51,7 +51,8 @@ BOOST_AUTO_TEST_CASE(path_segment_move_assignment)
 
 BOOST_AUTO_TEST_CASE(path_segment_equality)
 {
-	ventura::path_segment a, b = *ventura::path_segment::create("b"), c = *ventura::path_segment::create("c"), c2 = *ventura::path_segment::create("c");
+	ventura::path_segment a, b = *ventura::path_segment::create("b"), c = *ventura::path_segment::create("c"),
+	                         c2 = *ventura::path_segment::create("c");
 	BOOST_CHECK_EQUAL(a, a);
 	BOOST_CHECK_EQUAL(b, b);
 	BOOST_CHECK_EQUAL(c, c);
@@ -111,5 +112,6 @@ BOOST_AUTO_TEST_CASE(path_segment_boost_hash)
 
 BOOST_AUTO_TEST_CASE(path_segment_combine)
 {
-	BOOST_CHECK_EQUAL(ventura::relative_path("a/b"), *ventura::path_segment::create("a") / *ventura::path_segment::create("b"));
+	BOOST_CHECK_EQUAL(ventura::relative_path("a/b"),
+	                  *ventura::path_segment::create("a") / *ventura::path_segment::create("b"));
 }

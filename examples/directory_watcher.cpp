@@ -13,23 +13,25 @@ int main()
 
 	ventura::single_directory_watcher notifier(io, watched_dir);
 	auto all = Si::for_each(Si::ref(notifier), [](Si::error_or<ventura::file_notification> const &event)
-	{
-		if (event.is_error())
-		{
-			std::cerr << "Something went wrong while watching: " << event.error() << '\n';
-			return;
-		}
-		std::cerr <<
+	                        {
+		                        if (event.is_error())
+		                        {
+			                        std::cerr << "Something went wrong while watching: " << event.error() << '\n';
+			                        return;
+		                        }
+		                        std::cerr <<
 #if BOOST_VERSION >= 105000
-			boost::underlying_cast
+		                            boost::underlying_cast
 #else
-			static_cast
+                         static_cast
 #endif
-			<int>(event.get().type) << " " << event.get().name << '\n';
-	});
+		                            <int>(event.get().type)
+		                                  << " " << event.get().name << '\n';
+		                    });
 	all.start();
 	io.run();
 #else
-	std::cerr << "This example requires Boost filesystem and/or a more recent compiler\n";
+	std::cerr << "This example requires Boost filesystem and/or a more recent "
+	             "compiler\n";
 #endif
 }

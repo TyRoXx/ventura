@@ -39,11 +39,11 @@ BOOST_AUTO_TEST_CASE(file_size_error)
 {
 	Si::error_or<Si::optional<boost::uint64_t>> size = ventura::file_size(
 #ifdef _WIN32
-		INVALID_HANDLE_VALUE
+	    INVALID_HANDLE_VALUE
 #else
-		STDIN_FILENO
+	    STDIN_FILENO
 #endif
-		);
+	    );
 #ifdef _WIN32
 	BOOST_REQUIRE(size.is_error());
 	BOOST_CHECK_EQUAL(boost::system::error_code(ERROR_INVALID_HANDLE, boost::system::system_category()), size.error());

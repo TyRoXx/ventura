@@ -11,21 +11,15 @@ namespace ventura
 	{
 		struct watch_descriptor
 		{
-			watch_descriptor() BOOST_NOEXCEPT
-				: notifier(-1)
-				, watch(-1)
+			watch_descriptor() BOOST_NOEXCEPT : notifier(-1), watch(-1)
 			{
 			}
 
-			watch_descriptor(int notifier, int watch) BOOST_NOEXCEPT
-				: notifier(notifier)
-				, watch(watch)
+			watch_descriptor(int notifier, int watch) BOOST_NOEXCEPT : notifier(notifier), watch(watch)
 			{
 			}
 
-			watch_descriptor(watch_descriptor &&other) BOOST_NOEXCEPT
-				: notifier(other.notifier)
-				, watch(other.watch)
+			watch_descriptor(watch_descriptor &&other) BOOST_NOEXCEPT : notifier(other.notifier), watch(other.watch)
 			{
 				other.notifier = -1;
 			}
@@ -39,7 +33,7 @@ namespace ventura
 				inotify_rm_watch(notifier, watch);
 			}
 
-			watch_descriptor &operator = (watch_descriptor &&other) BOOST_NOEXCEPT
+			watch_descriptor &operator=(watch_descriptor &&other) BOOST_NOEXCEPT
 			{
 				boost::swap(notifier, other.notifier);
 				boost::swap(watch, other.watch);
@@ -58,7 +52,6 @@ namespace ventura
 			}
 
 		private:
-
 			int notifier;
 			int watch;
 		};

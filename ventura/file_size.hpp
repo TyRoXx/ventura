@@ -6,12 +6,13 @@
 #include <silicium/get_last_error.hpp>
 
 #ifndef _WIN32
-#	include <sys/stat.h>
+#include <sys/stat.h>
 #endif
 
 namespace ventura
 {
-	/// Returns the size of the regular file given by the file descriptor or none if the
+	/// Returns the size of the regular file given by the file descriptor or none if
+	/// the
 	/// file is not regular.
 	inline Si::error_or<Si::optional<boost::uint64_t>> file_size(Si::native_file_descriptor file)
 	{

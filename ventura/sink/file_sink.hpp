@@ -9,15 +9,15 @@
 #include <ventura/flush.hpp>
 
 #ifdef _WIN32
-#	include <silicium/win32/win32.hpp>
+#include <silicium/win32/win32.hpp>
 #else
-#	include <sys/uio.h>
+#include <sys/uio.h>
 #endif
 
 #ifdef __APPLE__
-#	define VENTURA_HAS_FILE_SINK 0
+#define VENTURA_HAS_FILE_SINK 0
 #else
-#	define VENTURA_HAS_FILE_SINK SILICIUM_HAS_VARIANT
+#define VENTURA_HAS_FILE_SINK SILICIUM_HAS_VARIANT
 #endif
 
 namespace ventura
@@ -45,7 +45,7 @@ namespace ventura
 		}
 
 		explicit file_sink(Si::native_file_descriptor destination)
-			: m_destination(destination)
+		    : m_destination(destination)
 		{
 		}
 
@@ -55,7 +55,6 @@ namespace ventura
 		}
 
 	private:
-
 		Si::native_file_descriptor m_destination;
 
 #ifdef _WIN32
@@ -74,46 +73,44 @@ namespace ventura
 
 		error_type append_one(element_type const &element)
 		{
-			return Si::visit<error_type>(
-				element,
-				[this](flush) -> error_type
-			{
-				if (FlushFileBuffers(m_destination))
-				{
-					return error_type();
-				}
-				return Si::get_last_error();
-			},
-				[this](Si::memory_range const &content) -> error_type
-			{
-				Si::error_or<std::size_t> written = write(m_destination, content);
-				if (!written.is_error())
-				{
-					assert(written.get() == static_cast<std::size_t>(content.size()));
-				}
-				return written.error();
-			},
-				[this](seek_set const request) -> error_type
-			{
-				LARGE_INTEGER distance;
-				distance.QuadPart = request.from_beginning;
-				if (SetFilePointerEx(m_destination, distance, NULL, FILE_BEGIN))
-				{
-					return error_type();
-				}
-				return Si::get_last_error();
-			},
-				[this](seek_add const request) -> error_type
-			{
-				LARGE_INTEGER distance;
-				distance.QuadPart = request.from_current;
-				if (SetFilePointerEx(m_destination, distance, NULL, FILE_CURRENT))
-				{
-					return error_type();
-				}
-				return Si::get_last_error();
-			}
-			);
+			return Si::visit<error_type>(element,
+			                             [this](flush) -> error_type
+			                             {
+				                             if (FlushFileBuffers(m_destination))
+				                             {
+					                             return error_type();
+				                             }
+				                             return Si::get_last_error();
+				                         },
+			                             [this](Si::memory_range const &content) -> error_type
+			                             {
+				                             Si::error_or<std::size_t> written = write(m_destination, content);
+				                             if (!written.is_error())
+				                             {
+					                             assert(written.get() == static_cast<std::size_t>(content.size()));
+				                             }
+				                             return written.error();
+				                         },
+			                             [this](seek_set const request) -> error_type
+			                             {
+				                             LARGE_INTEGER distance;
+				                             distance.QuadPart = request.from_beginning;
+				                             if (SetFilePointerEx(m_destination, distance, NULL, FILE_BEGIN))
+				                             {
+					                             return error_type();
+				                             }
+				                             return Si::get_last_error();
+				                         },
+			                             [this](seek_add const request) -> error_type
+			                             {
+				                             LARGE_INTEGER distance;
+				                             distance.QuadPart = request.from_current;
+				                             if (SetFilePointerEx(m_destination, distance, NULL, FILE_CURRENT))
+				                             {
+					                             return error_type();
+				                             }
+				                             return Si::get_last_error();
+				                         });
 		}
 #else
 		error_type append_impl(Si::iterator_range<element_type const *> data)
@@ -128,7 +125,8 @@ namespace ventura
 				}
 				if (*write_streak_length == 1)
 				{
-					auto error = write_piece(*Si::try_get_ptr<Si::memory_range>(*(data.begin() + i - *write_streak_length)));
+					auto error =
+					    write_piece(*Si::try_get_ptr<Si::memory_range>(*(data.begin() + i - *write_streak_length)));
 					write_streak_length = boost::none;
 					return error;
 				}
@@ -178,36 +176,35 @@ namespace ventura
 		error_type append_one(element_type const &element)
 		{
 			return Si::visit<error_type>(
-				element,
-				[this](flush) -> error_type
-				{
-					if (fdatasync(m_destination) == 0)
-					{
-						return error_type();
-					}
-					return Si::get_last_error();
+			    element,
+			    [this](flush) -> error_type
+			    {
+				    if (fdatasync(m_destination) == 0)
+				    {
+					    return error_type();
+				    }
+				    return Si::get_last_error();
 				},
-				[this](Si::memory_range const &content) -> error_type
-				{
-					return write_piece(content);
+			    [this](Si::memory_range const &content) -> error_type
+			    {
+				    return write_piece(content);
 				},
-				[this](seek_set const request) -> error_type
-				{
-					if (lseek64(m_destination, request.from_beginning, SEEK_SET) == static_cast<off_t>(-1))
-					{
-						return Si::get_last_error();
-					}
-					return error_type();
+			    [this](seek_set const request) -> error_type
+			    {
+				    if (lseek64(m_destination, request.from_beginning, SEEK_SET) == static_cast<off_t>(-1))
+				    {
+					    return Si::get_last_error();
+				    }
+				    return error_type();
 				},
-				[this](seek_add const request) -> error_type
-				{
-					if (lseek64(m_destination, request.from_current, SEEK_CUR) == static_cast<off_t>(-1))
-					{
-						return Si::get_last_error();
-					}
-					return error_type();
-				}
-			);
+			    [this](seek_add const request) -> error_type
+			    {
+				    if (lseek64(m_destination, request.from_current, SEEK_CUR) == static_cast<off_t>(-1))
+				    {
+					    return Si::get_last_error();
+				    }
+				    return error_type();
+				});
 		}
 
 		error_type write_piece(Si::memory_range const &content)
@@ -235,7 +232,7 @@ namespace ventura
 			{
 				return Si::get_last_error();
 			}
-			//assume that everything has been written
+			// assume that everything has been written
 			return error_type();
 		}
 #endif

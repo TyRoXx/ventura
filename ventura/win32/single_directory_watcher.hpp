@@ -36,11 +36,12 @@ namespace ventura
 				return file_notification_type::change_content_or_metadata;
 
 			default:
-				return Si::none; //TODO
+				return Si::none; // TODO
 			}
 		}
 
-		inline Si::optional<Si::error_or<ventura::file_notification>> to_portable_file_notification(Si::error_or<win32::file_notification> &&original)
+		inline Si::optional<Si::error_or<ventura::file_notification>>
+		to_portable_file_notification(Si::error_or<win32::file_notification> &&original)
 		{
 			if (original.is_error())
 			{
@@ -51,10 +52,11 @@ namespace ventura
 			{
 				return Si::none;
 			}
-			return Si::error_or<ventura::file_notification>(ventura::file_notification(*type, std::move(original.get().name), true));
+			return Si::error_or<ventura::file_notification>(
+			    ventura::file_notification(*type, std::move(original.get().name), true));
 		}
 	}
-	
+
 	struct single_directory_watcher
 	{
 		typedef Si::error_or<file_notification> element_type;
@@ -64,8 +66,9 @@ namespace ventura
 		}
 
 		explicit single_directory_watcher(boost::asio::io_service &io, ventura::absolute_path const &watched)
-			: impl(Si::error_or_enumerate(win32::overlapped_directory_changes(io, watched, false)), win32::to_portable_file_notification)
-			, work(boost::in_place(boost::ref(io)))
+		    : impl(Si::error_or_enumerate(win32::overlapped_directory_changes(io, watched, false)),
+		           win32::to_portable_file_notification)
+		    , work(boost::in_place(boost::ref(io)))
 		{
 		}
 
@@ -73,34 +76,31 @@ namespace ventura
 		void async_get_one(Observer &&observer)
 		{
 			impl.async_get_one(
-				Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>(
-				[observer
+			    Si::function_observer<std::function<void(
+			        Si::optional<Si::error_or<file_notification>>)>>([observer
 #if SILICIUM_COMPILER_HAS_EXTENDED_CAPTURE
-					= std::forward<Observer>(observer)
+			                                                          = std::forward<Observer>(observer)
 #endif
-				](Si::optional<Si::error_or<file_notification>> element) mutable
-				{
-					if (element)
-					{
-						std::move(observer).got_element(std::move(*element));
-					}
-					else
-					{
-						std::move(observer).ended();
-					}
-				})
-			);
+			](Si::optional<Si::error_or<file_notification>> element) mutable
+			                                                         {
+				                                                         if (element)
+				                                                         {
+					                                                         std::move(observer)
+					                                                             .got_element(std::move(*element));
+				                                                         }
+				                                                         else
+				                                                         {
+					                                                         std::move(observer).ended();
+				                                                         }
+				                                                     }));
 		}
 
 	private:
-
-		//TODO: save the memory for the function pointer
+		// TODO: save the memory for the function pointer
 		Si::conditional_transformer<
-			Si::error_or<file_notification>,
-			Si::error_or_enumerator<win32::overlapped_directory_changes>,
-			Si::optional<Si::error_or<file_notification>>(*)(Si::error_or<win32::file_notification> &&),
-			Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>
-		> impl;
+		    Si::error_or<file_notification>, Si::error_or_enumerator<win32::overlapped_directory_changes>,
+		    Si::optional<Si::error_or<file_notification>> (*)(Si::error_or<win32::file_notification> &&),
+		    Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>> impl;
 		boost::optional<boost::asio::io_service::work> work;
 	};
 #endif

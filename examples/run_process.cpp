@@ -11,14 +11,11 @@ int main(int argc, char **argv)
 	parameters.current_path = ventura::get_current_working_directory(Si::throw_);
 	parameters.arguments.emplace_back(argv[0]);
 	auto output = Si::Sink<char, Si::success>::erase(
-		Si::make_function_sink<char>(
-			[](Si::iterator_range<char const *> data) -> Si::success
-			{
-				std::cout.write(data.begin(), data.size());
-				return {};
-			}
-		)
-	);
+	    Si::make_function_sink<char>([](Si::iterator_range<char const *> data) -> Si::success
+	                                 {
+		                                 std::cout.write(data.begin(), data.size());
+		                                 return {};
+		                             }));
 	parameters.out = &output;
 	std::cerr << "This executable is:\n";
 	return ventura::run_process(parameters);

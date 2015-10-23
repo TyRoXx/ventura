@@ -11,7 +11,7 @@
 #include <silicium/get_last_error.hpp>
 #include <silicium/sink/sink.hpp>
 #ifdef _WIN32
-#	include <silicium/win32/win32.hpp>
+#include <silicium/win32/win32.hpp>
 #endif
 
 #include <iostream>
@@ -27,23 +27,22 @@ namespace ventura
 		{
 		}
 
-		absolute_path(absolute_path &&other) BOOST_NOEXCEPT
-		    : m_value(std::move(other.m_value))
+		absolute_path(absolute_path &&other) BOOST_NOEXCEPT : m_value(std::move(other.m_value))
 		{
 		}
 
 		absolute_path(absolute_path const &other)
-			: m_value(other.m_value)
+		    : m_value(other.m_value)
 		{
 		}
 
-		absolute_path &operator = (absolute_path &&other) BOOST_NOEXCEPT
+		absolute_path &operator=(absolute_path &&other) BOOST_NOEXCEPT
 		{
 			m_value = std::move(other.m_value);
 			return *this;
 		}
 
-		absolute_path &operator = (absolute_path const &other)
+		absolute_path &operator=(absolute_path const &other)
 		{
 			m_value = other.m_value;
 			return *this;
@@ -57,9 +56,9 @@ namespace ventura
 		SILICIUM_USE_RESULT
 		boost::filesystem::path
 #ifdef _WIN32
-		const &
+		    const &
 #endif
-		to_boost_path() const
+		    to_boost_path() const
 		{
 			return m_value.to_boost_path();
 		}
@@ -89,12 +88,12 @@ namespace ventura
 
 		void combine(relative_path const &back)
 		{
-			//TODO: optimize
+			// TODO: optimize
 			*this = absolute_path(to_boost_path() / back.to_boost_path());
 		}
 
 		template <class RelativePath>
-		absolute_path &operator /= (RelativePath &&other)
+		absolute_path &operator/=(RelativePath &&other)
 		{
 			combine(std::forward<RelativePath>(other));
 			return *this;
@@ -147,11 +146,10 @@ namespace ventura
 		}
 
 	private:
-
 		path m_value;
 
 		explicit absolute_path(boost::filesystem::path const &value)
-			: m_value(value)
+		    : m_value(value)
 		{
 		}
 	};
@@ -160,12 +158,12 @@ namespace ventura
 	BOOST_STATIC_ASSERT(Si::is_handle<absolute_path>::value);
 #endif
 
-	inline std::ostream &operator << (std::ostream &out, absolute_path const &p)
+	inline std::ostream &operator<<(std::ostream &out, absolute_path const &p)
 	{
 		return out << p.underlying();
 	}
 
-	inline std::istream &operator >> (std::istream &in, absolute_path &p)
+	inline std::istream &operator>>(std::istream &in, absolute_path &p)
 	{
 		absolute_path::underlying_type temp;
 		in >> temp;
@@ -184,53 +182,49 @@ namespace ventura
 	}
 
 	template <class ComparableToPath>
-	SILICIUM_USE_RESULT
-	inline bool operator == (absolute_path const &left, ComparableToPath const &right)
+	SILICIUM_USE_RESULT inline bool operator==(absolute_path const &left, ComparableToPath const &right)
 	{
 		return left.underlying() == right;
 	}
 
 	template <class ComparableToPath>
-	SILICIUM_USE_RESULT
-	inline bool operator == (ComparableToPath const &left, absolute_path const &right)
+	SILICIUM_USE_RESULT inline bool operator==(ComparableToPath const &left, absolute_path const &right)
 	{
 		return left == right.underlying();
 	}
 
 	SILICIUM_USE_RESULT
-	inline bool operator == (absolute_path const &left, boost::filesystem::path const &right)
+	inline bool operator==(absolute_path const &left, boost::filesystem::path const &right)
 	{
 		return right == left.c_str();
 	}
 
 	SILICIUM_USE_RESULT
-	inline bool operator == (boost::filesystem::path const &left, absolute_path const &right)
+	inline bool operator==(boost::filesystem::path const &left, absolute_path const &right)
 	{
 		return left == right.c_str();
 	}
 
 	SILICIUM_USE_RESULT
-	inline bool operator == (absolute_path const &left, absolute_path const &right)
+	inline bool operator==(absolute_path const &left, absolute_path const &right)
 	{
 		return left.underlying() == right.underlying();
 	}
 
 	template <class ComparableToPath>
-	SILICIUM_USE_RESULT
-	inline bool operator != (absolute_path const &left, ComparableToPath const &right)
+	SILICIUM_USE_RESULT inline bool operator!=(absolute_path const &left, ComparableToPath const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class ComparableToPath>
-	SILICIUM_USE_RESULT
-	inline bool operator != (ComparableToPath const &left, absolute_path const &right)
+	SILICIUM_USE_RESULT inline bool operator!=(ComparableToPath const &left, absolute_path const &right)
 	{
 		return !(left == right);
 	}
 
 	SILICIUM_USE_RESULT
-	inline bool operator < (absolute_path const &left, absolute_path const &right)
+	inline bool operator<(absolute_path const &left, absolute_path const &right)
 	{
 		return left.underlying() < right.underlying();
 	}
@@ -245,14 +239,14 @@ namespace ventura
 	SILICIUM_USE_RESULT
 	inline relative_path leaf(absolute_path const &whole)
 	{
-		//TODO: do this efficiently
+		// TODO: do this efficiently
 		return relative_path(whole.to_boost_path().leaf());
 	}
 
 	SILICIUM_USE_RESULT
 	inline Si::optional<absolute_path> parent(absolute_path const &whole)
 	{
-		//TODO: do this efficiently
+		// TODO: do this efficiently
 		auto boosted = whole.to_boost_path();
 		if (boosted.has_parent_path())
 		{
@@ -262,31 +256,30 @@ namespace ventura
 	}
 
 	SILICIUM_USE_RESULT
-	inline absolute_path operator / (absolute_path const &front, relative_path const &back)
+	inline absolute_path operator/(absolute_path const &front, relative_path const &back)
 	{
-		//TODO: do this efficiently
+		// TODO: do this efficiently
 		absolute_path result = front;
 		result.combine(back);
 		return result;
 	}
 
 	template <std::size_t N>
-	SILICIUM_USE_RESULT
-	inline absolute_path operator / (absolute_path const &front, absolute_path::char_type const (&literal)[N])
+	SILICIUM_USE_RESULT inline absolute_path operator/(absolute_path const &front,
+	                                                   absolute_path::char_type const(&literal)[N])
 	{
 		return front / relative_path(boost::filesystem::path(&literal[0]));
 	}
 
 #ifdef _WIN32
 	template <std::size_t N>
-	SILICIUM_USE_RESULT
-	inline absolute_path operator / (absolute_path const &front, char const (&literal)[N])
+	SILICIUM_USE_RESULT inline absolute_path operator/(absolute_path const &front, char const(&literal)[N])
 	{
 		return front / relative_path(boost::filesystem::path(&literal[0]));
 	}
 #endif
 
-	inline absolute_path operator / (absolute_path const &front, path_segment const &back)
+	inline absolute_path operator/(absolute_path const &front, path_segment const &back)
 	{
 		absolute_path result = front;
 		result.combine(relative_path(back.to_boost_path()));
@@ -307,9 +300,9 @@ namespace ventura
 	{
 		return path.to_boost_path().
 #ifdef _WIN32
-			wstring();
+		    wstring();
 #else
-			c_str();
+		    c_str();
 #endif
 	}
 }
@@ -317,7 +310,7 @@ namespace ventura
 namespace std
 {
 	template <>
-	struct hash< ::ventura::absolute_path>
+	struct hash<::ventura::absolute_path>
 	{
 		SILICIUM_USE_RESULT
 		std::size_t operator()(ventura::absolute_path const &value) const

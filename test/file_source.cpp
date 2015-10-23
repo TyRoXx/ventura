@@ -12,11 +12,11 @@ namespace
 	{
 		Si::native_path_string const name(
 #ifdef _WIN32
-			L"C:/Windows/system.ini"
+		    L"C:/Windows/system.ini"
 #else
-			"/dev/zero"
+		    "/dev/zero"
 #endif
-		);
+		    );
 		return ventura::open_reading(name).move_value();
 	}
 }
@@ -34,10 +34,12 @@ BOOST_AUTO_TEST_CASE(file_source)
 #if VENTURA_HAS_WRITE_FILE
 BOOST_AUTO_TEST_CASE(file_source_enumerate)
 {
-	BOOST_REQUIRE(!ventura::write_file(Si::native_path_string(SILICIUM_SYSTEM_LITERAL("test.txt")), Si::make_memory_range("Test", 4)));
+	BOOST_REQUIRE(!ventura::write_file(Si::native_path_string(SILICIUM_SYSTEM_LITERAL("test.txt")),
+	                                   Si::make_memory_range("Test", 4)));
 	auto f = ventura::open_reading(Si::native_path_string(SILICIUM_SYSTEM_LITERAL("test.txt"))).move_value();
 	std::array<char, 100> buffer;
-	auto s = Si::make_enumerating_source(Si::make_throwing_source(ventura::make_file_source(f.handle, Si::make_iterator_range(buffer.data(), buffer.data() + buffer.size()))));
+	auto s = Si::make_enumerating_source(Si::make_throwing_source(
+	    ventura::make_file_source(f.handle, Si::make_iterator_range(buffer.data(), buffer.data() + buffer.size()))));
 	BOOST_CHECK_EQUAL('T', Si::get(s));
 	BOOST_CHECK_EQUAL('e', Si::get(s));
 	BOOST_CHECK_EQUAL('s', Si::get(s));

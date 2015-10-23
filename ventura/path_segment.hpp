@@ -15,23 +15,22 @@ namespace ventura
 		{
 		}
 
-		path_segment(path_segment &&other) BOOST_NOEXCEPT
-		    : m_value(std::move(other.m_value))
+		path_segment(path_segment &&other) BOOST_NOEXCEPT : m_value(std::move(other.m_value))
 		{
 		}
 
 		path_segment(path_segment const &other)
-			: m_value(other.m_value)
+		    : m_value(other.m_value)
 		{
 		}
 
-		path_segment &operator = (path_segment &&other) BOOST_NOEXCEPT
+		path_segment &operator=(path_segment &&other) BOOST_NOEXCEPT
 		{
 			m_value = std::move(other.m_value);
 			return *this;
 		}
 
-		path_segment &operator = (path_segment const &other)
+		path_segment &operator=(path_segment const &other)
 		{
 			m_value = other.m_value;
 			return *this;
@@ -44,9 +43,9 @@ namespace ventura
 
 		boost::filesystem::path
 #ifdef _WIN32
-		const &
+		    const &
 #endif
-		to_boost_path() const
+		    to_boost_path() const
 		{
 			return m_value.to_boost_path();
 		}
@@ -81,11 +80,10 @@ namespace ventura
 		}
 
 	private:
-
 		path m_value;
 
 		explicit path_segment(boost::filesystem::path const &value)
-			: m_value(value)
+		    : m_value(value)
 		{
 		}
 	};
@@ -94,56 +92,56 @@ namespace ventura
 	BOOST_STATIC_ASSERT(Si::is_handle<path_segment>::value);
 #endif
 
-	inline std::ostream &operator << (std::ostream &out, path_segment const &p)
+	inline std::ostream &operator<<(std::ostream &out, path_segment const &p)
 	{
 		return out << p.underlying();
 	}
 
 	template <class ComparableToPath>
-	inline bool operator == (path_segment const &left, ComparableToPath const &right)
+	inline bool operator==(path_segment const &left, ComparableToPath const &right)
 	{
 		return left.underlying() == right;
 	}
 
 	template <class ComparableToPath>
-	inline bool operator == (ComparableToPath const &left, path_segment const &right)
+	inline bool operator==(ComparableToPath const &left, path_segment const &right)
 	{
 		return left == right.underlying();
 	}
 
-	inline bool operator == (path_segment const &left, boost::filesystem::path const &right)
+	inline bool operator==(path_segment const &left, boost::filesystem::path const &right)
 	{
 		return left.underlying().c_str() == right;
 	}
 
-	inline bool operator == (boost::filesystem::path const &left, path_segment const &right)
+	inline bool operator==(boost::filesystem::path const &left, path_segment const &right)
 	{
 		return left == right.underlying().c_str();
 	}
 
-	inline bool operator == (path_segment const &left, path_segment const &right)
+	inline bool operator==(path_segment const &left, path_segment const &right)
 	{
 		return left.underlying() == right.underlying();
 	}
 
 	template <class ComparableToPath>
-	inline bool operator != (path_segment const &left, ComparableToPath const &right)
+	inline bool operator!=(path_segment const &left, ComparableToPath const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class ComparableToPath>
-	inline bool operator != (ComparableToPath const &left, path_segment const &right)
+	inline bool operator!=(ComparableToPath const &left, path_segment const &right)
 	{
 		return !(left == right);
 	}
 
-	inline bool operator < (path_segment const &left, path_segment const &right)
+	inline bool operator<(path_segment const &left, path_segment const &right)
 	{
 		return left.underlying() < right.underlying();
 	}
 
-	inline path_segment operator + (path_segment left, path_segment const &right)
+	inline path_segment operator+(path_segment left, path_segment const &right)
 	{
 		left.append(right);
 		return left;
@@ -159,7 +157,7 @@ namespace ventura
 namespace std
 {
 	template <>
-	struct hash< ::ventura::path_segment>
+	struct hash<::ventura::path_segment>
 	{
 		std::size_t operator()(ventura::path_segment const &value) const
 		{

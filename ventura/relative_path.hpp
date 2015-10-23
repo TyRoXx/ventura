@@ -21,7 +21,7 @@ namespace ventura
 		}
 
 		explicit relative_path(path_segment const &segment)
-			: m_value(segment.underlying())
+		    : m_value(segment.underlying())
 		{
 		}
 
@@ -29,31 +29,31 @@ namespace ventura
 #ifdef _WIN32
 		    : m_value(value)
 #else
-			: m_value(value.c_str())
+		    : m_value(value.c_str())
 #endif
 		{
 		}
 
 		explicit relative_path(char_type const *c_str)
-			: m_value(c_str)
+		    : m_value(c_str)
 		{
 		}
 
 		template <std::size_t N>
-		explicit relative_path(char_type const (&c_str_literal)[N])
-			: m_value(c_str_literal)
+		explicit relative_path(char_type const(&c_str_literal)[N])
+		    : m_value(c_str_literal)
 		{
 		}
 
 #ifdef _WIN32
 		explicit relative_path(char const *c_str)
-			: m_value(c_str)
+		    : m_value(c_str)
 		{
 		}
 
 		template <std::size_t N>
-		explicit relative_path(char const (&c_str_literal)[N])
-			: m_value(c_str_literal)
+		explicit relative_path(char const(&c_str_literal)[N])
+		    : m_value(c_str_literal)
 		{
 		}
 #endif
@@ -64,23 +64,22 @@ namespace ventura
 		{
 		}
 
-		relative_path(relative_path &&other) BOOST_NOEXCEPT
-		    : m_value(std::move(other.m_value))
+		relative_path(relative_path &&other) BOOST_NOEXCEPT : m_value(std::move(other.m_value))
 		{
 		}
 
 		relative_path(relative_path const &other)
-			: m_value(other.m_value)
+		    : m_value(other.m_value)
 		{
 		}
 
-		relative_path &operator = (relative_path &&other) BOOST_NOEXCEPT
+		relative_path &operator=(relative_path &&other) BOOST_NOEXCEPT
 		{
 			m_value = std::move(other.m_value);
 			return *this;
 		}
 
-		relative_path &operator = (relative_path const &other)
+		relative_path &operator=(relative_path const &other)
 		{
 			m_value = other.m_value;
 			return *this;
@@ -94,9 +93,9 @@ namespace ventura
 		SILICIUM_USE_RESULT
 		boost::filesystem::path
 #ifdef _WIN32
-		const &
+		    const &
 #endif
-		to_boost_path() const
+		    to_boost_path() const
 		{
 			return m_value.to_boost_path();
 		}
@@ -125,7 +124,6 @@ namespace ventura
 		}
 
 	private:
-
 		path m_value;
 	};
 
@@ -133,59 +131,55 @@ namespace ventura
 	BOOST_STATIC_ASSERT(Si::is_handle<relative_path>::value);
 #endif
 
-	inline std::ostream &operator << (std::ostream &out, relative_path const &p)
+	inline std::ostream &operator<<(std::ostream &out, relative_path const &p)
 	{
 		return out << p.underlying();
 	}
 
 	template <class ComparableToPath>
-	SILICIUM_USE_RESULT
-	inline bool operator == (relative_path const &left, ComparableToPath const &right)
+	SILICIUM_USE_RESULT inline bool operator==(relative_path const &left, ComparableToPath const &right)
 	{
 		return left.underlying() == right;
 	}
 
 	template <class ComparableToPath>
-	SILICIUM_USE_RESULT
-	inline bool operator == (ComparableToPath const &left, relative_path const &right)
+	SILICIUM_USE_RESULT inline bool operator==(ComparableToPath const &left, relative_path const &right)
 	{
 		return left == right.underlying();
 	}
 
 	SILICIUM_USE_RESULT
-	inline bool operator == (relative_path const &left, boost::filesystem::path const &right)
+	inline bool operator==(relative_path const &left, boost::filesystem::path const &right)
 	{
 		return right == left.c_str();
 	}
 
 	SILICIUM_USE_RESULT
-	inline bool operator == (boost::filesystem::path const &left, relative_path const &right)
+	inline bool operator==(boost::filesystem::path const &left, relative_path const &right)
 	{
 		return left == right.c_str();
 	}
 
 	SILICIUM_USE_RESULT
-	inline bool operator == (relative_path const &left, relative_path const &right)
+	inline bool operator==(relative_path const &left, relative_path const &right)
 	{
 		return left.underlying() == right.underlying();
 	}
 
 	template <class ComparableToPath>
-	SILICIUM_USE_RESULT
-	inline bool operator != (relative_path const &left, ComparableToPath const &right)
+	SILICIUM_USE_RESULT inline bool operator!=(relative_path const &left, ComparableToPath const &right)
 	{
 		return !(left == right);
 	}
 
 	template <class ComparableToPath>
-	SILICIUM_USE_RESULT
-	inline bool operator != (ComparableToPath const &left, relative_path const &right)
+	SILICIUM_USE_RESULT inline bool operator!=(ComparableToPath const &left, relative_path const &right)
 	{
 		return !(left == right);
 	}
 
 	SILICIUM_USE_RESULT
-	inline bool operator < (relative_path const &left, relative_path const &right)
+	inline bool operator<(relative_path const &left, relative_path const &right)
 	{
 		return left.underlying() < right.underlying();
 	}
@@ -200,32 +194,32 @@ namespace ventura
 	SILICIUM_USE_RESULT
 	inline relative_path leaf(relative_path const &whole)
 	{
-		//TODO: do this efficiently
+		// TODO: do this efficiently
 		return relative_path(whole.to_boost_path().leaf());
 	}
 
 	SILICIUM_USE_RESULT
 	inline relative_path parent(relative_path const &whole)
 	{
-		//TODO: do this efficiently
+		// TODO: do this efficiently
 		return relative_path(whole.to_boost_path().parent_path());
 	}
 
 	SILICIUM_USE_RESULT
-	inline relative_path operator / (relative_path const &front, relative_path const &back)
+	inline relative_path operator/(relative_path const &front, relative_path const &back)
 	{
-		//TODO: do this efficiently
+		// TODO: do this efficiently
 		return relative_path(front.to_boost_path() / back.to_boost_path());
 	}
 
-	inline relative_path operator / (path_segment const &front, path_segment const &back)
+	inline relative_path operator/(path_segment const &front, path_segment const &back)
 	{
-		//TODO: do this efficiently
+		// TODO: do this efficiently
 		relative_path result(front.to_boost_path() / back.to_boost_path());
 		return result;
 	}
 
-	inline relative_path operator / (relative_path const &front, path_segment const &back)
+	inline relative_path operator/(relative_path const &front, path_segment const &back)
 	{
 		return front / relative_path(back.to_boost_path());
 	}
@@ -234,7 +228,7 @@ namespace ventura
 namespace std
 {
 	template <>
-	struct hash< ::ventura::relative_path>
+	struct hash<::ventura::relative_path>
 	{
 		SILICIUM_USE_RESULT
 		std::size_t operator()(ventura::relative_path const &value) const

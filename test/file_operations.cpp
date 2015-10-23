@@ -7,9 +7,9 @@
 #if VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS
 
 #ifdef _WIN32
-#	define SILICIUM_TEST_ROOT L"C:/"
+#define SILICIUM_TEST_ROOT L"C:/"
 #else
-#	define SILICIUM_TEST_ROOT "/"
+#define SILICIUM_TEST_ROOT "/"
 #endif
 
 namespace
@@ -20,12 +20,11 @@ namespace
 BOOST_AUTO_TEST_CASE(get_current_executable_path_throw)
 {
 	ventura::absolute_path p = ventura::get_current_executable_path(Si::throw_);
-	auto const expected =
-		"unit_test"
+	auto const expected = "unit_test"
 #ifdef _WIN32
-		".exe"
+	                      ".exe"
 #endif
-		;
+	    ;
 	BOOST_CHECK_EQUAL(expected, p.to_boost_path().leaf());
 }
 
@@ -33,12 +32,11 @@ BOOST_AUTO_TEST_CASE(get_current_executable_path_variant)
 {
 	Si::error_or<ventura::absolute_path> const p = ventura::get_current_executable_path(Si::variant_);
 	BOOST_REQUIRE(!p.is_error());
-	auto const expected =
-		"unit_test"
+	auto const expected = "unit_test"
 #ifdef _WIN32
-		".exe"
+	                      ".exe"
 #endif
-		;
+	    ;
 	BOOST_CHECK_EQUAL(expected, p.get().to_boost_path().leaf());
 }
 
@@ -62,7 +60,8 @@ BOOST_AUTO_TEST_CASE(test_file_exists_false_throw)
 
 BOOST_AUTO_TEST_CASE(test_file_exists_false_variant)
 {
-	Si::error_or<bool> const exists = ventura::file_exists(absolute_root / *ventura::path_segment::create("does-not-exist"), Si::variant_);
+	Si::error_or<bool> const exists =
+	    ventura::file_exists(absolute_root / *ventura::path_segment::create("does-not-exist"), Si::variant_);
 	BOOST_CHECK(!exists.get());
 }
 
@@ -88,14 +87,15 @@ BOOST_AUTO_TEST_CASE(test_get_home)
 #elif defined(__linux__)
 	BOOST_CHECK(boost::algorithm::starts_with(ventura::to_os_string(home), "/home/"));
 #else
-	//OSX
+	// OSX
 	BOOST_CHECK(boost::algorithm::starts_with(to_os_string(home), "/Users/"));
 #endif
 }
 
 BOOST_AUTO_TEST_CASE(test_copy_recursively)
 {
-	ventura::absolute_path const temp = ventura::temporary_directory(Si::throw_) / ventura::relative_path("silicium-test_copy_recursively");
+	ventura::absolute_path const temp =
+	    ventura::temporary_directory(Si::throw_) / ventura::relative_path("silicium-test_copy_recursively");
 	ventura::recreate_directories(temp, Si::throw_);
 	ventura::absolute_path const from = temp / ventura::relative_path("from");
 	ventura::absolute_path const to = temp / ventura::relative_path("to");

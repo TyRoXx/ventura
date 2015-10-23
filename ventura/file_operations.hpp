@@ -5,23 +5,23 @@
 #include <ventura/run_process.hpp>
 #include <silicium/identity.hpp>
 #ifdef _WIN32
-#	include <silicium/win32/win32.hpp>
-#	include <Shellapi.h>
-#	include <shlobj.h>
-#	undef interface
+#include <silicium/win32/win32.hpp>
+#include <Shellapi.h>
+#include <shlobj.h>
+#undef interface
 #else
-#	include <pwd.h>
+#include <pwd.h>
 #endif
 
 #ifdef __APPLE__
-#	include <mach-o/dyld.h>
+#include <mach-o/dyld.h>
 #endif
 
-//Boost filesystem requires exceptions
+// Boost filesystem requires exceptions
 #define VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS SILICIUM_HAS_EXCEPTIONS
 
 #if VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS
-#	include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/operations.hpp>
 #endif
 
 #include <boost/lexical_cast.hpp>
@@ -32,7 +32,8 @@ namespace ventura
 #if VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS
 	template <class ErrorHandler>
 	inline auto get_current_working_directory(ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<absolute_path>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<absolute_path>()))
 	{
 		boost::system::error_code ec;
 		auto result = boost::filesystem::current_path(ec);
@@ -46,7 +47,8 @@ namespace ventura
 	template <class ErrorHandler>
 	inline auto remove_file(absolute_path const &name, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code ec;
@@ -57,7 +59,8 @@ namespace ventura
 	template <class ErrorHandler>
 	inline auto create_directories(absolute_path const &directories, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code ec;
@@ -67,7 +70,8 @@ namespace ventura
 
 	template <class ErrorHandler>
 	inline auto remove_all(absolute_path const &directories, ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<boost::uintmax_t>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<boost::uintmax_t>()))
 	{
 		boost::system::error_code ec;
 		auto count = boost::filesystem::remove_all(directories.to_boost_path(), ec);
@@ -113,7 +117,8 @@ namespace ventura
 	template <class ErrorHandler>
 	auto recreate_directories(absolute_path const &directories, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code error = detail::recreate_directories(directories);
@@ -123,7 +128,8 @@ namespace ventura
 	template <class ErrorHandler>
 	auto copy(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code ec;
@@ -146,14 +152,11 @@ namespace ventura
 #endif
 
 	template <class ErrorHandler>
-	auto copy_recursively(
-		absolute_path const &from,
-		absolute_path const &to,
-		Si::Sink<char, Si::success>::interface *output,
-		ErrorHandler &&handle_error
-	)
+	auto copy_recursively(absolute_path const &from, absolute_path const &to,
+	                      Si::Sink<char, Si::success>::interface *output, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<void>()))
 #endif
 	{
 #ifdef _WIN32
@@ -169,7 +172,9 @@ namespace ventura
 		int rc = SHFileOperationW(&s);
 		if (rc)
 		{
-			throw std::runtime_error("SHFileOperationW FO_COPY from " + to_utf8_string(from) + " to " + to_utf8_string(to) + " failed with return code " + boost::lexical_cast<std::string>(rc));
+			throw std::runtime_error("SHFileOperationW FO_COPY from " + to_utf8_string(from) + " to " +
+			                         to_utf8_string(to) + " failed with return code " +
+			                         boost::lexical_cast<std::string>(rc));
 		}
 		return std::forward<ErrorHandler>(handle_error)(boost::system::error_code(), Si::identity<void>());
 #else
@@ -185,16 +190,16 @@ namespace ventura
 		Si::error_or<int> result = run_process(*absolute_path::create("/bin/cp"), arguments, from, *output);
 		if (!result.is_error() && (result.get() != 0))
 		{
-			throw std::runtime_error("cp failed"); //TODO: return a custom error_code for that
+			throw std::runtime_error("cp failed"); // TODO: return a custom error_code for that
 		}
 		return std::forward<ErrorHandler>(handle_error)(result.error(), Si::identity<void>());
 #endif
 	}
 
 	template <class ErrorHandler>
-	SILICIUM_USE_RESULT
-	auto file_exists(absolute_path const &file, ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<bool>()))
+	SILICIUM_USE_RESULT auto file_exists(absolute_path const &file, ErrorHandler &&handle_error)
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<bool>()))
 	{
 		boost::system::error_code ec;
 		boost::filesystem::file_status status = boost::filesystem::status(file.to_boost_path(), ec);
@@ -212,7 +217,8 @@ namespace ventura
 	template <class ErrorHandler>
 	auto rename(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<void>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<void>()))
 #endif
 	{
 		boost::system::error_code ec;
@@ -222,10 +228,11 @@ namespace ventura
 
 	template <class ErrorHandler>
 	auto get_current_executable_path(ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<absolute_path>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<absolute_path>()))
 	{
 #ifdef _WIN32
-		//will be enough for most cases
+		// will be enough for most cases
 		std::vector<wchar_t> buffer(MAX_PATH);
 		for (;;)
 		{
@@ -273,7 +280,8 @@ namespace ventura
 
 	template <class ErrorHandler>
 	auto temporary_directory(ErrorHandler &&handle_error)
-		-> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(), Si::identity<absolute_path>()))
+	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
+	                                                         Si::identity<absolute_path>()))
 	{
 		boost::system::error_code ec;
 		auto temp = boost::filesystem::temp_directory_path(ec);
@@ -305,7 +313,11 @@ namespace ventura
 			throw std::runtime_error("Could not get home");
 		}
 		std::unique_ptr<wchar_t, detail::co_task_mem_deleter> raii_path(path);
-		return absolute_path::create(raii_path.get()).or_throw([] { throw std::runtime_error("Windows returned a non-absolute path for home"); });
+		return absolute_path::create(raii_path.get())
+		    .or_throw([]
+		              {
+			              throw std::runtime_error("Windows returned a non-absolute path for home");
+			          });
 	}
 #else
 	inline absolute_path get_home()

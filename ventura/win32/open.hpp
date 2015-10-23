@@ -11,7 +11,8 @@ namespace ventura
 	SILICIUM_USE_RESULT
 	inline Si::error_or<Si::file_handle> open_reading(Si::native_path_string name)
 	{
-		Si::native_file_descriptor const fd = ::CreateFileW(name.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_ALWAYS, 0, NULL);
+		Si::native_file_descriptor const fd =
+		    ::CreateFileW(name.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_ALWAYS, 0, NULL);
 		if (fd == INVALID_HANDLE_VALUE)
 		{
 			return Si::get_last_error();
@@ -22,7 +23,8 @@ namespace ventura
 	SILICIUM_USE_RESULT
 	inline Si::error_or<Si::file_handle> create_file(Si::native_path_string name)
 	{
-		Si::native_file_descriptor const fd = ::CreateFileW(name.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_NEW, 0, NULL);
+		Si::native_file_descriptor const fd =
+		    ::CreateFileW(name.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_NEW, 0, NULL);
 		if (fd == INVALID_HANDLE_VALUE)
 		{
 			return Si::get_last_error();
@@ -33,7 +35,8 @@ namespace ventura
 	SILICIUM_USE_RESULT
 	inline Si::error_or<Si::file_handle> overwrite_file(Si::native_path_string name)
 	{
-		Si::native_file_descriptor const fd = ::CreateFileW(name.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, 0, NULL);
+		Si::native_file_descriptor const fd =
+		    ::CreateFileW(name.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, 0, NULL);
 		if (fd == INVALID_HANDLE_VALUE)
 		{
 			return Si::get_last_error();
@@ -44,7 +47,8 @@ namespace ventura
 	SILICIUM_USE_RESULT
 	inline Si::error_or<Si::file_handle> open_read_write(Si::native_path_string name)
 	{
-		Si::native_file_descriptor const fd = ::CreateFileW(name.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_WRITE, nullptr, CREATE_NEW, 0, NULL);
+		Si::native_file_descriptor const fd =
+		    ::CreateFileW(name.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_WRITE, nullptr, CREATE_NEW, 0, NULL);
 		if (fd == INVALID_HANDLE_VALUE)
 		{
 			return Si::get_last_error();
