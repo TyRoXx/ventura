@@ -268,14 +268,16 @@ namespace ventura
 		return result;
 	}
 
-	inline Si::noexcept_string to_utf8_string(boost::filesystem::path const &path)
+	template <class String = Si::noexcept_string>
+	String to_utf8_string(boost::filesystem::path const &path)
 	{
-		return Si::to_utf8_string(path.string());
+		return Si::to_utf8_string<String>(path.string());
 	}
 
-	inline Si::noexcept_string to_utf8_string(absolute_path const &path)
+	template <class String = Si::noexcept_string>
+	String to_utf8_string(absolute_path const &path)
 	{
-		return to_utf8_string(path.to_boost_path());
+		return to_utf8_string<String>(path.to_boost_path());
 	}
 
 	inline Si::os_string to_os_string(absolute_path const &path)
