@@ -64,7 +64,7 @@ namespace Si
 		parameters.executable = absolute_root / "does-not-exist";
 		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
 		BOOST_CHECK_EXCEPTION(
-		    ventura::run_process(parameters), boost::system::system_error, [](boost::system::system_error const &e)
+		    ventura::run_process(parameters).get(), boost::system::system_error, [](boost::system::system_error const &e)
 		    {
 			    return e.code() == boost::system::error_code(ENOENT, boost::system::system_category());
 			});
