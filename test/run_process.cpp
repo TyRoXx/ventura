@@ -38,7 +38,7 @@ namespace Si
 		std::vector<char> out;
 		auto sink = Si::virtualize_sink(make_iterator_sink<char>(std::back_inserter(out)));
 		parameters.out = &sink;
-		int result = ventura::run_process(parameters);
+		int result = ventura::run_process(parameters).get();
 		BOOST_CHECK_EQUAL(2, result);
 		std::size_t const windows7whereHelpSize = 1830;
 		std::size_t const windowsServer2012whereHelpSize = 1705;
