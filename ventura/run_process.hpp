@@ -28,7 +28,7 @@ namespace ventura
 
 namespace ventura
 {
-	inline int run_process(process_parameters const &parameters)
+	inline Si::error_or<int> run_process(process_parameters const &parameters)
 	{
 		async_process_parameters async_parameters;
 		async_parameters.executable = parameters.executable;
@@ -91,20 +91,20 @@ namespace ventura
 			                         });
 
 #ifdef _WIN32
-		auto waited = std::async(std::launch::deferred, [&process, &stop_polling, &io]()
-		                         {
-			                         int rc = process.wait_for_exit().get();
-			                         io.stop();
-			                         stop_polling.set_value();
-			                         return rc;
-			                     });
+		std::future<Si::error_or<int>> waited = std::async(std::launch::deferred, [&process, &stop_polling, &io]()
+		                                                   {
+			                                                   Si::error_or<int> rc = process.wait_for_exit();
+			                                                   io.stop();
+			                                                   stop_polling.set_value();
+			                                                   return rc;
+			                                               });
 		io.run();
 		copy_input.get();
 		return waited.get();
 #else
 		io.run();
 		copy_input.get();
-		return process.wait_for_exit().get();
+		return process.wait_for_exit();
 #endif
 	}
 

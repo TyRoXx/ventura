@@ -22,7 +22,7 @@ namespace Si
 		std::vector<char> out;
 		auto sink = Si::virtualize_sink(make_iterator_sink<char>(std::back_inserter(out)));
 		parameters.out = &sink;
-		int result = ventura::run_process(parameters);
+		int result = ventura::run_process(parameters).get();
 		BOOST_CHECK_EQUAL(0, result);
 		std::string const expected = "/usr/bin/which\n";
 		BOOST_CHECK_EQUAL(expected, std::string(begin(out), end(out)));

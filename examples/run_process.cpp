@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 		                             }));
 	parameters.out = &output;
 	std::cerr << "This executable is:\n";
-	return ventura::run_process(parameters);
+	return ventura::run_process(parameters).get();
 #else
 	boost::ignore_unused_variable_warning(argv);
 	std::cerr << "This example requires Si::run_process to be available\n";
