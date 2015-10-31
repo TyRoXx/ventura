@@ -109,33 +109,6 @@ namespace ventura
 	}
 
 	SILICIUM_USE_RESULT
-	inline int run_process(boost::filesystem::path executable, std::vector<Si::noexcept_string> arguments,
-	                       boost::filesystem::path current_path, Si::Sink<char, Si::success>::interface &output)
-	{
-		process_parameters parameters;
-		parameters.executable =
-		    absolute_path::create(std::move(executable))
-		        .or_throw([]
-		                  {
-			                  throw std::invalid_argument("The executable must be an absolute path.");
-			              });
-		boost::range::transform(arguments, std::back_inserter(parameters.arguments),
-		                        [&parameters](Si::noexcept_string const &argument)
-		                        {
-			                        return Si::to_os_string(argument);
-			                    });
-		parameters.current_path =
-		    absolute_path::create(std::move(current_path))
-		        .or_throw([]
-		                  {
-			                  throw std::invalid_argument("The current directory must be an absolute path.");
-			              });
-		parameters.out = &output;
-		parameters.err = &output;
-		return run_process(parameters);
-	}
-
-	SILICIUM_USE_RESULT
 	inline Si::error_or<int> run_process(absolute_path executable, std::vector<Si::os_string> arguments,
 	                                     absolute_path current_directory,
 	                                     Si::Sink<char, Si::success>::interface &output)
