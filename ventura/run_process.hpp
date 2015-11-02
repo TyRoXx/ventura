@@ -4,6 +4,10 @@
 #include <ventura/async_process.hpp>
 #include <silicium/write.hpp>
 #include <silicium/sink/multi_sink.hpp>
+#include <silicium/sink/iterator_sink.hpp>
+#include <silicium/sink/copy.hpp>
+#include <silicium/source/range_source.hpp>
+#include <silicium/source/transforming_source.hpp>
 #include <boost/range/algorithm/transform.hpp>
 
 namespace ventura
@@ -122,6 +126,7 @@ namespace ventura
 		return run_process(parameters);
 	}
 
+#ifdef _WIN32
 	SILICIUM_USE_RESULT
 	inline Si::error_or<int>
 	run_process(absolute_path executable, std::vector<Si::os_string> arguments, absolute_path current_directory,
@@ -132,6 +137,36 @@ namespace ventura
 		process_parameters parameters;
 		parameters.executable = std::move(executable);
 		parameters.arguments = std::move(arguments);
+		parameters.current_path = std::move(current_directory);
+		parameters.out = &output;
+		parameters.err = &output;
+		parameters.additional_environment = std::move(additional_environment);
+		parameters.inheritance = inheritance;
+		return run_process(parameters);
+	}
+#endif
+
+	SILICIUM_USE_RESULT
+	inline Si::error_or<int>
+	run_process(absolute_path executable, std::vector<Si::noexcept_string> arguments, absolute_path current_directory,
+	            Si::Sink<char, Si::success>::interface &output,
+	            std::vector<std::pair<Si::os_char const *, Si::os_char const *>> additional_environment,
+	            environment_inheritance inheritance)
+	{
+		process_parameters parameters;
+		parameters.executable = std::move(executable);
+		std::vector<Si::os_string> new_arguments;
+		{
+			auto new_arguments_sink = Si::make_container_sink(new_arguments);
+			auto arguments_encoder = Si::make_transforming_source(
+			    Si::make_range_source(Si::make_contiguous_range(arguments)), [](Si::noexcept_string const &in)
+			    {
+				    // TODO: move if possible
+				    return Si::to_utf8_string(in);
+				});
+			Si::copy(arguments_encoder, new_arguments_sink);
+		}
+		parameters.arguments = std::move(new_arguments);
 		parameters.current_path = std::move(current_directory);
 		parameters.out = &output;
 		parameters.err = &output;
