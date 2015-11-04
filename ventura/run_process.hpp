@@ -158,12 +158,13 @@ namespace ventura
 		std::vector<Si::os_string> new_arguments;
 		{
 			auto new_arguments_sink = Si::make_container_sink(new_arguments);
-			auto arguments_encoder = Si::make_transforming_source(
-			    Si::make_range_source(Si::make_contiguous_range(arguments)), [](Si::noexcept_string const &in)
-			    {
-				    // TODO: move if possible
-				    return Si::to_utf8_string(in);
-				});
+			auto arguments_encoder =
+			    Si::make_transforming_source(Si::make_range_source(Si::make_contiguous_range(arguments)),
+			                                 [](Si::noexcept_string const &in) -> Si::os_string
+			                                 {
+				                                 // TODO: mvoe the string if possible
+				                                 return Si::to_os_string(in);
+				                             });
 			Si::copy(arguments_encoder, new_arguments_sink);
 		}
 		parameters.arguments = std::move(new_arguments);
