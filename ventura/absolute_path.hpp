@@ -127,12 +127,12 @@ namespace ventura
 
 		Si::optional<path_segment> name() const
 		{
-			auto &&path = to_boost_path();
-			if (!path.has_filename())
+			auto &&boost_path = to_boost_path();
+			if (!boost_path.has_filename())
 			{
 				return Si::none;
 			}
-			return path_segment::create(path.filename());
+			return path_segment::create(path(boost_path.filename()));
 		}
 
 	private:

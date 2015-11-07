@@ -44,7 +44,7 @@ namespace ventura
 		}
 
 		template <std::size_t N>
-		explicit path(char_type const(&c_str_literal)[N])
+		path(char_type const(&c_str_literal)[N])
 		    : m_value(c_str_literal)
 		{
 			normalize_slashes();

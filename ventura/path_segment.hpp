@@ -61,11 +61,12 @@ namespace ventura
 			m_value.append(right.m_value);
 		}
 
-		static Si::optional<path_segment> create(boost::filesystem::path const &maybe_segment)
+		static Si::optional<path_segment> create(path const &maybe_segment)
 		{
-			if (maybe_segment.parent_path().empty())
+			boost::filesystem::path boost_maybe_segment = maybe_segment.to_boost_path();
+			if (boost_maybe_segment.parent_path().empty())
 			{
-				return path_segment(maybe_segment);
+				return path_segment(std::move(maybe_segment));
 			}
 			return Si::none;
 		}
@@ -73,8 +74,8 @@ namespace ventura
 	private:
 		path m_value;
 
-		explicit path_segment(boost::filesystem::path const &value)
-		    : m_value(value)
+		explicit path_segment(path value)
+			: m_value(std::move(value))
 		{
 		}
 	};
