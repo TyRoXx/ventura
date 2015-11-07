@@ -104,7 +104,7 @@ namespace ventura
 						    {
 							    inotify_event const &event =
 							        *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
-							    Si::optional<path_segment> segment = path_segment::create(boost::filesystem::path(
+							    Si::optional<path_segment> segment = path_segment::create(path(
 							        event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')));
 							    assert(segment);
 							    changes.emplace_back(file_notification{event.mask, std::move(*segment), event.wd});
