@@ -133,14 +133,8 @@ namespace ventura
 #endif
 
 	SILICIUM_USE_RESULT
-	inline Si::error_or<int>
-	run_process(absolute_path executable, std::vector<Si::noexcept_string> arguments, absolute_path current_directory,
-	            Si::Sink<char, Si::success>::interface &output,
-	            std::vector<std::pair<Si::os_char const *, Si::os_char const *>> additional_environment,
-	            environment_inheritance inheritance)
+	inline std::vector<Si::os_string> arguments_to_os_strings(std::vector<Si::noexcept_string> const &arguments)
 	{
-		process_parameters parameters;
-		parameters.executable = std::move(executable);
 		std::vector<Si::os_string> new_arguments;
 		{
 			auto new_arguments_sink = Si::make_container_sink(new_arguments);
@@ -153,6 +147,19 @@ namespace ventura
 				                             });
 			Si::copy(arguments_encoder, new_arguments_sink);
 		}
+		return new_arguments;
+	}
+
+	SILICIUM_USE_RESULT
+	inline Si::error_or<int>
+	run_process(absolute_path executable, std::vector<Si::noexcept_string> arguments, absolute_path current_directory,
+	            Si::Sink<char, Si::success>::interface &output,
+	            std::vector<std::pair<Si::os_char const *, Si::os_char const *>> additional_environment,
+	            environment_inheritance inheritance)
+	{
+		process_parameters parameters;
+		parameters.executable = std::move(executable);
+		std::vector<Si::os_string> new_arguments = arguments_to_os_strings(arguments);
 		parameters.arguments = std::move(new_arguments);
 		parameters.current_path = std::move(current_directory);
 		parameters.out = &output;
