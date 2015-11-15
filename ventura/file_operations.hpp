@@ -180,7 +180,7 @@ namespace ventura
 		}
 		return std::forward<ErrorHandler>(handle_error)(boost::system::error_code(), Si::identity<void>());
 #else
-		std::vector<Si::os_string> arguments;
+		std::vector<Si::noexcept_string> arguments;
 		arguments.push_back(SILICIUM_SYSTEM_LITERAL("-Rv"));
 		arguments.push_back(from.c_str());
 		arguments.push_back(to.c_str());
@@ -189,7 +189,8 @@ namespace ventura
 		{
 			output = &null_output;
 		}
-		Si::error_or<int> result = run_process(*absolute_path::create("/bin/cp"), arguments, from, *output);
+		Si::error_or<int> result = run_process(*absolute_path::create("/bin/cp"), arguments, from, *output, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(),
+		                                       environment_inheritance::inherit);
 		if (!result.is_error() && (result.get() != 0))
 		{
 			throw std::runtime_error("cp failed"); // TODO: return a custom error_code for that
