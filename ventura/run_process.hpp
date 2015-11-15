@@ -112,20 +112,6 @@ namespace ventura
 #endif
 	}
 
-	SILICIUM_USE_RESULT
-	inline Si::error_or<int> run_process(absolute_path executable, std::vector<Si::os_string> arguments,
-	                                     absolute_path current_directory,
-	                                     Si::Sink<char, Si::success>::interface &output)
-	{
-		process_parameters parameters;
-		parameters.executable = std::move(executable);
-		parameters.arguments = std::move(arguments);
-		parameters.current_path = std::move(current_directory);
-		parameters.out = &output;
-		parameters.err = &output;
-		return run_process(parameters);
-	}
-
 #ifdef _WIN32
 	SILICIUM_USE_RESULT
 	inline Si::error_or<int>
