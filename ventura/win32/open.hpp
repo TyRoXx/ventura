@@ -5,6 +5,7 @@
 #include <silicium/file_handle.hpp>
 #include <silicium/c_string.hpp>
 #include <silicium/get_last_error.hpp>
+#include <ventura/absolute_path.hpp>
 
 namespace ventura
 {
@@ -30,6 +31,12 @@ namespace ventura
 			return Si::get_last_error();
 		}
 		return Si::file_handle(fd);
+	}
+
+	SILICIUM_USE_RESULT
+	inline Si::error_or<Si::file_handle> create_file(absolute_path const &name)
+	{
+		return create_file(Si::native_path_string(to_os_string(name).c_str()));
 	}
 
 	SILICIUM_USE_RESULT

@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(test_file_exists_false_variant)
 BOOST_AUTO_TEST_CASE(test_rename)
 {
 	ventura::absolute_path const from = ventura::temporary_directory().get() / ventura::unique_path();
-	ventura::create_file(from.safe_c_str()).move_value();
+	ventura::create_file(from).move_value();
 	ventura::absolute_path const to = ventura::temporary_directory().get() /ventura::unique_path();
 	BOOST_CHECK(!ventura::file_exists(to).get());
 	boost::system::error_code const error = ventura::rename(from, to);
