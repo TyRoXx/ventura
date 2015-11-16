@@ -4,6 +4,7 @@
 #include <silicium/error_or.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/c_string.hpp>
+#include <ventura/absolute_path.hpp>
 
 #if defined(__unix) || defined(__APPLE__)
 #include <fcntl.h>
@@ -30,6 +31,11 @@ namespace ventura
 			return Si::get_last_error();
 		}
 		return Si::file_handle(fd);
+	}
+
+	inline Si::error_or<Si::file_handle> create_file(absolute_path const &name)
+	{
+		return create_file(name.safe_c_str());
 	}
 
 	inline Si::error_or<Si::file_handle> overwrite_file(Si::native_path_string name)
