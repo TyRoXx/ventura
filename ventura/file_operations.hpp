@@ -217,6 +217,11 @@ namespace ventura
 		return true;
 	}
 
+	inline Si::error_or<bool> file_exists(absolute_path const &file)
+	{
+		return file_exists(file, Si::variant_);
+	}
+
 	template <class ErrorHandler>
 	auto rename(absolute_path const &from, absolute_path const &to, ErrorHandler &&handle_error)
 #if !SILICIUM_COMPILER_HAS_AUTO_RETURN_TYPE
@@ -227,6 +232,16 @@ namespace ventura
 		boost::system::error_code ec;
 		boost::filesystem::rename(from.to_boost_path(), to.to_boost_path(), ec);
 		return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
+	}
+
+	inline boost::system::error_code rename(absolute_path const &from, absolute_path const &to)
+	{
+		return rename(from, to, Si::return_);
+	}
+
+	inline path_segment unique_path()
+	{
+		return *path_segment::create(path(boost::filesystem::unique_path()));
 	}
 
 	template <class ErrorHandler>
@@ -281,6 +296,11 @@ namespace ventura
 #endif
 	}
 
+	inline Si::error_or<absolute_path> get_current_executable_path()
+	{
+		return get_current_executable_path(Si::variant_);
+	}
+
 	template <class ErrorHandler>
 	auto temporary_directory(ErrorHandler &&handle_error)
 	    -> decltype(std::forward<ErrorHandler>(handle_error)(boost::declval<boost::system::error_code>(),
@@ -293,6 +313,11 @@ namespace ventura
 			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<absolute_path>());
 		}
 		return *absolute_path::create(std::move(temp));
+	}
+
+	inline Si::error_or<absolute_path> temporary_directory()
+	{
+		return temporary_directory(Si::variant_);
 	}
 
 #ifdef _WIN32

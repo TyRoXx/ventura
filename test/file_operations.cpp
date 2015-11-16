@@ -17,6 +17,18 @@ namespace
 	ventura::absolute_path const absolute_root = *ventura::absolute_path::create(SILICIUM_TEST_ROOT);
 }
 
+BOOST_AUTO_TEST_CASE(get_current_executable_path)
+{
+	Si::error_or<ventura::absolute_path> const p = ventura::get_current_executable_path();
+	BOOST_REQUIRE(!p.is_error());
+	auto const expected = "unit_test"
+#ifdef _WIN32
+	                      ".exe"
+#endif
+	    ;
+	BOOST_CHECK_EQUAL(expected, p.get().to_boost_path().leaf());
+}
+
 BOOST_AUTO_TEST_CASE(get_current_executable_path_throw)
 {
 	ventura::absolute_path p = ventura::get_current_executable_path(Si::throw_);
@@ -40,6 +52,12 @@ BOOST_AUTO_TEST_CASE(get_current_executable_path_variant)
 	BOOST_CHECK_EQUAL(expected, p.get().to_boost_path().leaf());
 }
 
+BOOST_AUTO_TEST_CASE(test_file_exists_true)
+{
+	Si::error_or<bool> const exists = ventura::file_exists(absolute_root);
+	BOOST_CHECK(exists.get());
+}
+
 BOOST_AUTO_TEST_CASE(test_file_exists_true_throw)
 {
 	bool exists = ventura::file_exists(absolute_root, Si::throw_);
@@ -50,6 +68,13 @@ BOOST_AUTO_TEST_CASE(test_file_exists_true_variant)
 {
 	Si::error_or<bool> const exists = ventura::file_exists(absolute_root, Si::variant_);
 	BOOST_CHECK(exists.get());
+}
+
+BOOST_AUTO_TEST_CASE(test_file_exists_false)
+{
+	Si::error_or<bool> const exists =
+	    ventura::file_exists(absolute_root / *ventura::path_segment::create("does-not-exist"));
+	BOOST_CHECK(!exists.get());
 }
 
 BOOST_AUTO_TEST_CASE(test_file_exists_false_throw)
@@ -63,6 +88,24 @@ BOOST_AUTO_TEST_CASE(test_file_exists_false_variant)
 	Si::error_or<bool> const exists =
 	    ventura::file_exists(absolute_root / *ventura::path_segment::create("does-not-exist"), Si::variant_);
 	BOOST_CHECK(!exists.get());
+}
+
+BOOST_AUTO_TEST_CASE(test_rename)
+{
+	ventura::absolute_path const from = ventura::temporary_directory().get() / ventura::unique_path();
+	ventura::create_file(from.safe_c_str()).move_value();
+	ventura::absolute_path const to = ventura::temporary_directory().get() /ventura::unique_path();
+	BOOST_CHECK(!ventura::file_exists(to).get());
+	boost::system::error_code const error = ventura::rename(from, to);
+	BOOST_CHECK(ventura::file_exists(to).get());
+	BOOST_CHECK(!error);
+}
+
+BOOST_AUTO_TEST_CASE(test_temporary_directory)
+{
+	Si::error_or<ventura::absolute_path> const p = ventura::temporary_directory();
+	BOOST_REQUIRE(!p.is_error());
+	BOOST_CHECK(!p.get().empty());
 }
 
 BOOST_AUTO_TEST_CASE(test_temporary_directory_throw)
