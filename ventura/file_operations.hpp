@@ -162,21 +162,46 @@ namespace ventura
 #endif
 	{
 #ifdef _WIN32
-		boost::ignore_unused_variable_warning(output);
-		std::vector<wchar_t> to_double_zero = detail::double_zero_terminate(to.to_boost_path().native());
-		std::vector<wchar_t> from_double_zero = detail::double_zero_terminate(from.to_boost_path().native());
-		SHFILEOPSTRUCTW s = {0};
-		s.hwnd = ::GetConsoleWindow();
-		s.wFunc = FO_COPY;
-		s.fFlags = FOF_SILENT;
-		s.pTo = to_double_zero.data();
-		s.pFrom = from_double_zero.data();
-		int rc = SHFileOperationW(&s);
-		if (rc)
+		boost::system::error_code ec = create_directories(to, Si::return_);
+		if (!!ec)
 		{
-			throw std::runtime_error("SHFileOperationW FO_COPY from " + to_utf8_string(from) + " to " +
-			                         to_utf8_string(to) + " failed with return code " +
-			                         boost::lexical_cast<std::string>(rc));
+			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
+		}
+
+		boost::filesystem::directory_iterator i(from.to_boost_path(), ec);
+		if (!!ec)
+		{
+			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
+		}
+
+		for (; i != boost::filesystem::directory_iterator();)
+		{
+			switch (i->status().type())
+			{
+			case boost::filesystem::directory_file:
+			{
+				boost::filesystem::path leaf = i->path().leaf();
+				ec = copy_recursively(*absolute_path::create(i->path()), to / relative_path(leaf), output, Si::return_);
+				if (!!ec)
+				{
+					return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
+				}
+				break;
+			}
+
+			case boost::filesystem::regular_file:
+			{
+				boost::filesystem::path leaf = i->path().leaf();
+				boost::filesystem::copy_file(i->path(), to.to_boost_path() / leaf,
+				                             boost::filesystem::copy_option::fail_if_exists);
+				break;
+			}
+			}
+			i.increment(ec);
+			if (!!ec)
+			{
+				return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
+			}
 		}
 		return std::forward<ErrorHandler>(handle_error)(boost::system::error_code(), Si::identity<void>());
 #else
