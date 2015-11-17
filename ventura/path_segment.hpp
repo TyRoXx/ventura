@@ -75,7 +75,7 @@ namespace ventura
 		path m_value;
 
 		explicit path_segment(path value)
-			: m_value(std::move(value))
+		    : m_value(std::move(value))
 		{
 		}
 	};

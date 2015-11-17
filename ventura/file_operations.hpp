@@ -189,7 +189,8 @@ namespace ventura
 		{
 			output = &null_output;
 		}
-		Si::error_or<int> result = run_process(*absolute_path::create("/bin/cp"), arguments, from, *output, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(),
+		Si::error_or<int> result = run_process(*absolute_path::create("/bin/cp"), arguments, from, *output,
+		                                       std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(),
 		                                       environment_inheritance::inherit);
 		if (!result.is_error() && (result.get() != 0))
 		{
