@@ -205,10 +205,22 @@ namespace ventura
 		}
 		return std::forward<ErrorHandler>(handle_error)(boost::system::error_code(), Si::identity<void>());
 #else
+		boost::system::error_code ec = create_directories(to, Si::return_);
+		if (!!ec)
+		{
+			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
+		}
+
+		ec = remove_all(to, Si::variant_).error();
+		if (!!ec)
+		{
+			return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
+		}
+
 		std::vector<Si::noexcept_string> arguments;
 		arguments.push_back(SILICIUM_SYSTEM_LITERAL("-Rv"));
-		arguments.push_back(from.c_str());
-		arguments.push_back(to.c_str());
+		arguments.push_back(to_utf8_string(from));
+		arguments.push_back(to_utf8_string(to));
 		auto null_output = Si::Sink<char, Si::success>::erase(Si::null_sink<char, Si::success>());
 		if (!output)
 		{
