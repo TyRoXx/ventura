@@ -158,14 +158,14 @@ BOOST_AUTO_TEST_CASE(test_copy_recursively_exists)
 BOOST_AUTO_TEST_CASE(test_copy_recursively_does_not_exist)
 {
 	ventura::absolute_path const temp =
-		ventura::temporary_directory(Si::throw_) / ventura::relative_path("silicium-test_copy_recursively");
+	    ventura::temporary_directory(Si::throw_) / ventura::relative_path("silicium-test_copy_recursively");
 	ventura::recreate_directories(temp, Si::throw_);
 	ventura::absolute_path const from = temp / ventura::relative_path("from");
 	ventura::absolute_path const to = temp / ventura::relative_path("to");
 	ventura::create_directories(from, Si::throw_);
 	auto const expected = Si::make_c_str_range("Hello");
 	Si::throw_if_error(ventura::write_file(
-		Si::native_path_string(to_os_string(from / ventura::relative_path("file.txt")).c_str()), expected));
+	    Si::native_path_string(to_os_string(from / ventura::relative_path("file.txt")).c_str()), expected));
 	BOOST_REQUIRE(!ventura::file_exists(to).get());
 	ventura::copy_recursively(from, to, nullptr, Si::throw_);
 	BOOST_REQUIRE(ventura::file_exists(to).get());
@@ -178,14 +178,14 @@ BOOST_AUTO_TEST_CASE(test_copy_recursively_does_not_exist)
 BOOST_AUTO_TEST_CASE(test_copy_recursively_parent_does_not_exist)
 {
 	ventura::absolute_path const temp =
-		ventura::temporary_directory(Si::throw_) / ventura::relative_path("silicium-test_copy_recursively");
+	    ventura::temporary_directory(Si::throw_) / ventura::relative_path("silicium-test_copy_recursively");
 	ventura::recreate_directories(temp, Si::throw_);
 	ventura::absolute_path const from = temp / ventura::relative_path("from");
 	ventura::absolute_path const to = temp / ventura::relative_path("parent/to");
 	ventura::create_directories(from, Si::throw_);
 	auto const expected = Si::make_c_str_range("Hello");
 	Si::throw_if_error(ventura::write_file(
-		Si::native_path_string(to_os_string(from / ventura::relative_path("file.txt")).c_str()), expected));
+	    Si::native_path_string(to_os_string(from / ventura::relative_path("file.txt")).c_str()), expected));
 	BOOST_REQUIRE(!ventura::file_exists(to).get());
 	ventura::copy_recursively(from, to, nullptr, Si::throw_);
 	BOOST_REQUIRE(ventura::file_exists(to).get());
