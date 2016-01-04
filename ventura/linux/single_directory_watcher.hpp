@@ -55,16 +55,16 @@ namespace ventura
 			return Si::none;
 		}
 
-		Si::optional<Si::error_or<ventura::file_notification>>
-		to_portable_file_notification(linux::file_notification &&original, relative_path const &root)
+		Si::optional<ventura::file_notification> to_portable_file_notification(linux::file_notification &&original,
+		                                                                       relative_path const &root)
 		{
 			auto const type = to_portable_file_notification_type(original.mask);
 			if (!type)
 			{
 				return Si::none;
 			}
-			return Si::error_or<ventura::file_notification>(ventura::file_notification(
-			    *type, root / std::move(original.name), (original.mask & IN_ISDIR) == IN_ISDIR));
+			return ventura::file_notification(*type, root / std::move(original.name),
+			                                  (original.mask & IN_ISDIR) == IN_ISDIR);
 		}
 	}
 
@@ -81,7 +81,11 @@ namespace ventura
 		    , impl(Si::enumerate(Si::ref(inotify)),
 		           [](linux::file_notification &&notification)
 		           {
-			           return linux::to_portable_file_notification(std::move(notification), relative_path());
+			           return Si::fmap(linux::to_portable_file_notification(std::move(notification), relative_path()),
+			                           [](ventura::file_notification notification)
+			                           {
+				                           return Si::error_or<ventura::file_notification>(std::move(notification));
+				                       });
 			       })
 		    , root(Si::get(inotify.watch(watched, (IN_MODIFY | IN_CLOSE_WRITE | IN_MOVED_FROM | IN_MOVED_TO |
 		                                           IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF | IN_ATTRIB))))
