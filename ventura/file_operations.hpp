@@ -384,7 +384,13 @@ namespace ventura
 	inline Si::error_or<boost::uint64_t> cursor_position(Si::native_file_descriptor file)
 	{
 #ifdef _WIN32
-		throw std::logic_error("to do");
+		LARGE_INTEGER position;
+		position.QuadPart = 0;
+		if (!SetFilePointerEx(file, position, &position, FILE_CURRENT))
+		{
+			return Si::get_last_error();
+		}
+		return static_cast<boost::uint64_t>(position.QuadPart);
 #else
 		auto position = lseek(file, 0, SEEK_CUR);
 		if (position < 0)
