@@ -403,7 +403,11 @@ namespace ventura
 		                                            {
 			                                            throw std::runtime_error("Expected file to have a size");
 			                                        });
-		content.resize(size);
+		if (size > content.max_size())
+		{
+			throw std::bad_alloc();
+		}
+		content.resize(static_cast<std::size_t>(size));
 		if (Si::read(file, Si::make_memory_range(content)).get() != size)
 		{
 			throw std::runtime_error(boost::str(boost::format("Could not read %1% bytes from a file") % size));
