@@ -417,7 +417,7 @@ namespace ventura
 
 	inline Si::error_or<std::vector<char>> read_file(absolute_path const &path)
 	{
-		Si::file_handle file = ventura::open_read_write(safe_c_str(to_native_range(path))).move_value();
+		Si::file_handle file = ventura::open_reading(safe_c_str(to_native_range(path))).move_value();
 		return read_file(file.handle);
 	}
 
