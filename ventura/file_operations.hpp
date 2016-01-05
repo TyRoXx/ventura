@@ -365,11 +365,11 @@ namespace ventura
 	inline boost::system::error_code seek_absolute(Si::native_file_descriptor file, boost::uint64_t destination)
 	{
 #ifdef _WIN32
-		LARGE_INTEGER destinationConverted;
-		destinationConverted.QuadPart = destination;
-		if (!SetFilePointerEx(file, destinationConverted, nullptr, SEEK_SET))
+		LARGE_INTEGER destination_converted;
+		destination_converted.QuadPart = destination;
+		if (!SetFilePointerEx(file, destination_converted, nullptr, FILE_BEGIN))
 		{
-			return boost::system::error_code(GetLastError(), boost::system::native_ecat);
+			return Si::get_last_error();
 		}
 #else
 		auto position = lseek(file, destination, SEEK_SET);
