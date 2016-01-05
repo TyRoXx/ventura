@@ -194,4 +194,24 @@ BOOST_AUTO_TEST_CASE(test_copy_recursively_parent_does_not_exist)
 	std::vector<char> const file_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	BOOST_CHECK_EQUAL_COLLECTIONS(file_content.begin(), file_content.end(), expected.begin(), expected.end());
 }
+
+BOOST_AUTO_TEST_CASE(test_cursor_position)
+{
+	Si::file_handle file =
+	    ventura::overwrite_file(
+	        ventura::safe_c_str(ventura::to_native_range(ventura::temporary_directory(Si::throw_) /
+	                                                     ventura::relative_path("test_cursor_position"))))
+	        .move_value();
+	BOOST_REQUIRE_EQUAL(0u, ventura::cursor_position(file.handle).get());
+	Si::write(file.handle, Si::make_c_str_range("0123456789")).get();
+	BOOST_REQUIRE_EQUAL(10u, ventura::cursor_position(file.handle).get());
+	Si::throw_if_error(ventura::seek_absolute(file.handle, 4));
+	BOOST_REQUIRE_EQUAL(4u, ventura::cursor_position(file.handle).get());
+	Si::write(file.handle, Si::make_c_str_range("abc"));
+	BOOST_REQUIRE_EQUAL(7u, ventura::cursor_position(file.handle).get());
+	Si::throw_if_error(ventura::seek_absolute(file.handle, 0));
+	std::vector<char> const content = ventura::read_file(file.handle).get();
+	std::string const expected = "0123abc789";
+	BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), content.begin(), content.end());
+}
 #endif

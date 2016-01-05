@@ -3,6 +3,9 @@
 
 #include <silicium/error_handler.hpp>
 #include <ventura/run_process.hpp>
+#include <ventura/file_size.hpp>
+#include <ventura/open.hpp>
+#include <silicium/read_file.hpp>
 #include <silicium/identity.hpp>
 #ifdef _WIN32
 #include <silicium/win32/win32.hpp>
@@ -25,6 +28,7 @@
 #endif
 
 #include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
 #include <iostream>
 
 namespace ventura
@@ -356,6 +360,61 @@ namespace ventura
 	inline Si::error_or<absolute_path> temporary_directory()
 	{
 		return temporary_directory(Si::variant_);
+	}
+
+	inline boost::system::error_code seek_absolute(Si::native_file_descriptor file, boost::uint64_t destination)
+	{
+#ifdef _WIN32
+		LARGE_INTEGER destinationConverted;
+		destinationConverted.QuadPart = destination;
+		if (!SetFilePointerEx(file, destinationConverted, nullptr, SEEK_SET))
+		{
+			return boost::system::error_code(GetLastError(), boost::system::native_ecat);
+		}
+#else
+		auto position = lseek(file, destination, SEEK_SET);
+		if (static_cast<boost::uint64_t>(position) != destination)
+		{
+			return Si::get_last_error();
+		}
+#endif
+		return boost::system::error_code();
+	}
+
+	inline Si::error_or<boost::uint64_t> cursor_position(Si::native_file_descriptor file)
+	{
+#ifdef _WIN32
+		throw std::logic_error("to do");
+#else
+		auto position = lseek(file, 0, SEEK_CUR);
+		if (position < 0)
+		{
+			return Si::get_last_error();
+		}
+		return static_cast<boost::uint64_t>(position);
+#endif
+	}
+
+	inline Si::error_or<std::vector<char>> read_file(Si::native_file_descriptor file)
+	{
+		std::vector<char> content;
+		boost::uint64_t size =
+		    ventura::file_size(file).get().or_throw([]
+		                                            {
+			                                            throw std::runtime_error("Expected file to have a size");
+			                                        });
+		content.resize(size);
+		if (Si::read(file, Si::make_memory_range(content)).get() != size)
+		{
+			throw std::runtime_error(boost::str(boost::format("Could not read %1% bytes from a file") % size));
+		}
+		return Si::error_or<std::vector<char>>(std::move(content));
+	}
+
+	inline Si::error_or<std::vector<char>> read_file(absolute_path const &path)
+	{
+		Si::file_handle file = ventura::open_read_write(safe_c_str(to_native_range(path))).move_value();
+		return read_file(file.handle);
 	}
 
 #ifdef _WIN32
