@@ -1,8 +1,13 @@
 [requires]
 Boost/1.60.0@lasote/stable
+silicium/0.2@TyRoXx/master
 
 [options]
 Boost:shared=True
 
 [generators]
 cmake
+
+[imports]
+bin, *.dll -> ./bin
+lib, *.dylib* -> ./bin
