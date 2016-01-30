@@ -297,7 +297,7 @@ namespace ventura
 		std::vector<wchar_t> buffer(MAX_PATH);
 		for (;;)
 		{
-			DWORD const length = GetModuleFileNameW(NULL, buffer.data(), buffer.size());
+			DWORD const length = GetModuleFileNameW(NULL, buffer.data(), static_cast<DWORD>(buffer.size()));
 			boost::system::error_code const ec = Si::get_last_error();
 			switch (ec.value())
 			{
