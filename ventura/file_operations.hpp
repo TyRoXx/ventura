@@ -7,6 +7,7 @@
 #include <ventura/open.hpp>
 #include <silicium/read_file.hpp>
 #include <silicium/identity.hpp>
+#include <silicium/arithmetic/add.hpp>
 #ifdef _WIN32
 #include <silicium/win32/win32.hpp>
 #include <Shellapi.h>
@@ -301,8 +302,16 @@ namespace ventura
 			switch (ec.value())
 			{
 			case ERROR_INSUFFICIENT_BUFFER:
-				buffer.resize(buffer.size() * 2);
+			{
+				Si::overflow_or<std::size_t> const new_buffer_size = Si::checked_add(buffer.size(), buffer.size());
+				if (new_buffer_size.is_overflow() || (*new_buffer_size.value() > (std::numeric_limits<DWORD>::max)()))
+				{
+					// Win32 seems to return nonsense here. Better stop here entirely for safety reasons.
+					std::terminate();
+				}
+				buffer.resize(*new_buffer_size.value());
 				break;
+			}
 
 			case ERROR_SUCCESS:
 			{
