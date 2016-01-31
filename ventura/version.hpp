@@ -2,7 +2,7 @@
 #define VENTURA_VERSION_HPP
 
 #define VENTURA_MAJOR_VERSION 0
-#define VENTURA_MINOR_VERSION 1
+#define VENTURA_MINOR_VERSION 2
 #define VENTURA_PATCH_VERSION 0
 
 #define VENTURA_MAKE_VERSION(major, minor, patch) ((((major * 100) + minor) * 100) + patch)
