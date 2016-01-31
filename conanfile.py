@@ -5,7 +5,7 @@ class VenturaConan(ConanFile):
     name = "ventura"
     version = "0.2"
     generators = "cmake"
-    requires = "silicium/0.2@TyRoXx/master"
+    requires = "silicium/0.3@TyRoXx/master"
     url="http://github.com/tyroxx/ventura"
     license="MIT"
     exports="ventura/*"
