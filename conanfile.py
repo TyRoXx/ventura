@@ -3,7 +3,7 @@ import os
 
 class VenturaConan(ConanFile):
     name = "ventura"
-    version = "0.2"
+    version = "0.3"
     generators = "cmake"
     requires = "silicium/0.10@TyRoXx/master"
     url="http://github.com/TyRoXx/ventura"
