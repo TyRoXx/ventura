@@ -19,16 +19,16 @@ addons:
     - g++-4.6
     
 env:
- - CPP=g++-5   GCC=gcc-5   BUILD_TYPE=Release
- - CPP=g++-5   GCC=gcc-5   BUILD_TYPE=Debug
- - CPP=g++-4.9 GCC=gcc-4.9 BUILD_TYPE=Release
- - CPP=g++-4.9 GCC=gcc-4.9 BUILD_TYPE=Debug
- - CPP=g++-4.8 GCC=gcc-4.8 BUILD_TYPE=Release
- - CPP=g++-4.8 GCC=gcc-4.8 BUILD_TYPE=Debug
- - CPP=g++-4.7 GCC=gcc-4.7 BUILD_TYPE=Debug
- - CPP=g++-4.7 GCC=gcc-4.7 BUILD_TYPE=Release
- - CPP=g++-4.6 GCC=gcc-4.6 BUILD_TYPE=Debug
- - CPP=g++-4.6 GCC=gcc-4.6 BUILD_TYPE=Release
+ - CPP=g++-5   GCC=gcc-5   CONAN="-s compiler.version=5.2 BUILD_TYPE=Release
+ - CPP=g++-5   GCC=gcc-5   CONAN="-s compiler.version=5.2 BUILD_TYPE=Debug
+ - CPP=g++-4.9 GCC=gcc-4.9 CONAN="-s compiler.version=4.9 BUILD_TYPE=Release
+ - CPP=g++-4.9 GCC=gcc-4.9 CONAN="-s compiler.version=4.9 BUILD_TYPE=Debug
+ - CPP=g++-4.8 GCC=gcc-4.8 CONAN="-s compiler.version=4.8 BUILD_TYPE=Release
+ - CPP=g++-4.8 GCC=gcc-4.8 CONAN="-s compiler.version=4.8 BUILD_TYPE=Debug
+ - CPP=g++-4.7 GCC=gcc-4.7 CONAN="-s compiler.version=4.7 BUILD_TYPE=Debug
+ - CPP=g++-4.7 GCC=gcc-4.7 CONAN="-s compiler.version=4.7 BUILD_TYPE=Release
+ - CPP=g++-4.6 GCC=gcc-4.6 CONAN="-s compiler.version=4.6 BUILD_TYPE=Debug
+ - CPP=g++-4.6 GCC=gcc-4.6 CONAN="-s compiler.version=4.6 BUILD_TYPE=Release
 
 install:
  - wget https://s3-eu-west-1.amazonaws.com/conanio-production/downloads/conan-ubuntu-64_0_8_0.deb -O conan.deb || exit 1
