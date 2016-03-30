@@ -10,7 +10,6 @@ notifications:
 addons:
   apt:
     sources:
-    - boost-latest
     - ubuntu-toolchain-r-test
     packages:
     - g++-5
@@ -18,31 +17,36 @@ addons:
     - g++-4.8
     - g++-4.7
     - g++-4.6
-    - libboost1.55-all-dev
     
 env:
- - CPP=g++-5   PEDANTIC=ON  NO_EXCEPTIONS=ON  NO_RTTI=OFF BUILD_TYPE=Release
- - CPP=g++-5   PEDANTIC=ON  NO_EXCEPTIONS=OFF NO_RTTI=ON  BUILD_TYPE=Release
- - CPP=g++-5   PEDANTIC=ON  NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Release
- - CPP=g++-5   PEDANTIC=ON  NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Debug
- - CPP=g++-4.9 PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Release
- - CPP=g++-4.9 PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Debug
- - CPP=g++-4.8 PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Release
- - CPP=g++-4.8 PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Debug
- - CPP=g++-4.7 PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Debug
- - CPP=g++-4.7 PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Release
- - CPP=g++-4.6 PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Debug
- - CPP=g++-4.6 PEDANTIC=OFF NO_EXCEPTIONS=OFF NO_RTTI=OFF BUILD_TYPE=Release
+ - CPP=g++-5   BUILD_TYPE=Release
+ - CPP=g++-5   BUILD_TYPE=Debug
+ - CPP=g++-4.9 BUILD_TYPE=Release
+ - CPP=g++-4.9 BUILD_TYPE=Debug
+ - CPP=g++-4.8 BUILD_TYPE=Release
+ - CPP=g++-4.8 BUILD_TYPE=Debug
+ - CPP=g++-4.7 BUILD_TYPE=Debug
+ - CPP=g++-4.7 BUILD_TYPE=Release
+ - CPP=g++-4.6 BUILD_TYPE=Debug
+ - CPP=g++-4.6 BUILD_TYPE=Release
 
-before_install:
- - git submodule update --init --recursive
+install:
+ - wget https://s3-eu-west-1.amazonaws.com/conanio-production/downloads/conan-ubuntu-64_0_8_0.deb -O conan.deb || exit 1
+ - sudo dpkg -i conan.deb || exit 1
+ - rm conan.deb || exit 1
+ - conan --version
+
+ - wget https://s3.amazonaws.com/biibinaries/thirdparty/cmake-3.0.2-Linux-64.tar.gz
+ - tar -xzf cmake-3.0.2-Linux-64.tar.gz
+ - sudo cp -fR cmake-3.0.2-Linux-64/* /usr
+ - rm -rf cmake-3.0.2-Linux-64
+ - rm cmake-3.0.2-Linux-64.tar.gz
 
 script:
  - mkdir build
- - cd build
- - CXX=$CPP cmake .. -DVENTURA_PEDANTIC=$PEDANTIC -DVENTURA_NO_EXCEPTIONS=$NO_EXCEPTIONS -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DVENTURA_TESTS_RUNNING_ON_TRAVIS_CI=ON -DVENTURA_NO_RTTI=$NO_RTTI || exit 1
+ - pushd build
+ - CXX=$CPP CC=$GCC conan install -s compiler=gcc $CONAN .. || exit 1
+ - CXX=$CPP CC=$GCC cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE || exit 1
  - cmake --build . -- -j2 || exit 1
- - cd test
- - if [ $NO_RTTI != "ON" ]; then
-     ./unit_test || exit 1;
-   fi
+ - pushd bin
+ - ./tests || exit 1;
