@@ -4,6 +4,7 @@
 #include <silicium/observable/observer.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
+#include <silicium/make_unique.hpp>
 #include <silicium/throw_last_error.hpp>
 #include <ventura/linux/inotify_watch_descriptor.hpp>
 #include <ventura/absolute_path.hpp>

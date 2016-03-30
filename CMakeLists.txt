@@ -122,10 +122,10 @@ else()
 	endif()
 	include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 	link_directories(${Boost_LIBRARY_DIR})
-endif()
 
-set(SILICIUM_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dependencies/silicium CACHE TYPE PATH)
-include_directories(${SILICIUM_INCLUDE_DIR})
+	set(SILICIUM_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dependencies/silicium CACHE TYPE PATH)
+	include_directories(${SILICIUM_INCLUDE_DIR})
+endif()
 
 if(WIN32)
 	#Boost.Asio wants this for no reason

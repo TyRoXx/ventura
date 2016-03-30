@@ -38,10 +38,6 @@ namespace ventura
 		{
 		}
 	};
-
-#if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(Si::is_handle<file_notification>::value);
-#endif
 }
 
 #endif

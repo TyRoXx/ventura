@@ -112,10 +112,6 @@ namespace ventura
 		}
 	};
 
-#if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(Si::is_handle<path>::value);
-#endif
-
 	inline std::ostream &operator<<(std::ostream &out, path const &p)
 	{
 		return out << p.underlying();

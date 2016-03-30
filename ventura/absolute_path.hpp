@@ -6,7 +6,6 @@
 #include <silicium/optional.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/os_string.hpp>
-#include <silicium/is_handle.hpp>
 #include <silicium/c_string.hpp>
 #include <silicium/get_last_error.hpp>
 #include <silicium/sink/sink.hpp>
@@ -143,10 +142,6 @@ namespace ventura
 		{
 		}
 	};
-
-#if SILICIUM_HAS_IS_HANDLE
-	BOOST_STATIC_ASSERT(Si::is_handle<absolute_path>::value);
-#endif
 
 	inline std::ostream &operator<<(std::ostream &out, absolute_path const &p)
 	{
