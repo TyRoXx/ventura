@@ -502,7 +502,7 @@ namespace ventura
 			            [work, copyable_file, destination, stop_polling_shared]()
 			            {
 				            win32::copy_whole_pipe(copyable_file->handle, destination, std::move(*stop_polling_shared));
-				            return Si::nothing();
+				            return Si::unit();
 				        })));
 #elif SILICIUM_HAS_SPAWN_COROUTINE
 			boost::ignore_unused_variable_warning(stop_polling);
