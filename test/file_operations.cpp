@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(get_current_executable_path)
 {
 	Si::error_or<ventura::absolute_path> const p = ventura::get_current_executable_path();
 	BOOST_REQUIRE(!p.is_error());
-	auto const expected = "unit_test"
+	auto const expected = "tests"
 #ifdef _WIN32
 	                      ".exe"
 #endif
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(get_current_executable_path)
 BOOST_AUTO_TEST_CASE(get_current_executable_path_throw)
 {
 	ventura::absolute_path p = ventura::get_current_executable_path(Si::throw_);
-	auto const expected = "unit_test"
+	auto const expected = "tests"
 #ifdef _WIN32
 	                      ".exe"
 #endif
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(get_current_executable_path_variant)
 {
 	Si::error_or<ventura::absolute_path> const p = ventura::get_current_executable_path(Si::variant_);
 	BOOST_REQUIRE(!p.is_error());
-	auto const expected = "unit_test"
+	auto const expected = "tests"
 #ifdef _WIN32
 	                      ".exe"
 #endif
