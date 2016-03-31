@@ -25,8 +25,6 @@ env:
  - CPP=g++-4.9 GCC=gcc-4.9 CONAN="-s compiler.version=4.9" BUILD_TYPE=Debug
  - CPP=g++-4.8 GCC=gcc-4.8 CONAN="-s compiler.version=4.8" BUILD_TYPE=Release
  - CPP=g++-4.8 GCC=gcc-4.8 CONAN="-s compiler.version=4.8" BUILD_TYPE=Debug
- - CPP=g++-4.7 GCC=gcc-4.7 CONAN="-s compiler.version=4.7" BUILD_TYPE=Debug
- - CPP=g++-4.7 GCC=gcc-4.7 CONAN="-s compiler.version=4.7" BUILD_TYPE=Release
  - CPP=g++-4.6 GCC=gcc-4.6 CONAN="-s compiler.version=4.6" BUILD_TYPE=Debug
  - CPP=g++-4.6 GCC=gcc-4.6 CONAN="-s compiler.version=4.6" BUILD_TYPE=Release
 
