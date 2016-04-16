@@ -1,19 +1,19 @@
 #ifndef VENTURA_REACTIVE_LINUX_INOTIFY_HPP
 #define VENTURA_REACTIVE_LINUX_INOTIFY_HPP
 
-#include <silicium/observable/observer.hpp>
+#include <boost/asio/posix/stream_descriptor.hpp>
+#include <boost/optional.hpp>
+#include <boost/ref.hpp>
+#include <boost/swap.hpp>
+#include <dirent.h>
 #include <silicium/error_or.hpp>
 #include <silicium/exchange.hpp>
 #include <silicium/make_unique.hpp>
+#include <silicium/observable/observer.hpp>
 #include <silicium/throw_last_error.hpp>
-#include <ventura/linux/inotify_watch_descriptor.hpp>
 #include <ventura/absolute_path.hpp>
+#include <ventura/linux/inotify_watch_descriptor.hpp>
 #include <ventura/path_segment.hpp>
-#include <boost/asio/posix/stream_descriptor.hpp>
-#include <boost/swap.hpp>
-#include <boost/optional.hpp>
-#include <boost/ref.hpp>
-#include <dirent.h>
 
 #define VENTURA_HAS_INOTIFY_OBSERVABLE SILICIUM_HAS_EXCEPTIONS
 
@@ -85,36 +85,34 @@ namespace ventura
 				std::size_t const additional_buffer = 8192;
 				read_buffer.resize(min_buffer_size + additional_buffer);
 				assert(notifier);
-				notifier->async_read_some(
-				    boost::asio::buffer(read_buffer),
-				    [ this, SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver)) ](
-				        boost::system::error_code error, std::size_t bytes_read) mutable
-				    {
-					    if (error)
-					    {
-						    if (error == boost::asio::error::operation_aborted)
-						    {
-							    return;
-						    }
-						    throw std::logic_error("not implemented");
-					    }
-					    else
-					    {
-						    std::vector<file_notification> changes;
-						    for (std::size_t i = 0; i < bytes_read;)
-						    {
-							    inotify_event const &event =
-							        *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
-							    Si::optional<path_segment> segment = path_segment::create(
-							        path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')));
-							    assert(segment);
-							    changes.emplace_back(file_notification{event.mask, std::move(*segment), event.wd});
-							    i += sizeof(inotify_event);
-							    i += event.len;
-						    }
-						    std::forward<Observer>(receiver).got_element(std::move(changes));
-					    }
-					});
+				notifier->async_read_some(boost::asio::buffer(read_buffer), [
+					this, SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))
+				](boost::system::error_code error, std::size_t bytes_read) mutable {
+					if (error)
+					{
+						if (error == boost::asio::error::operation_aborted)
+						{
+							return;
+						}
+						throw std::logic_error("not implemented");
+					}
+					else
+					{
+						std::vector<file_notification> changes;
+						for (std::size_t i = 0; i < bytes_read;)
+						{
+							inotify_event const &event =
+							    *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
+							Si::optional<path_segment> segment = path_segment::create(
+							    path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')));
+							assert(segment);
+							changes.emplace_back(file_notification{event.mask, std::move(*segment), event.wd});
+							i += sizeof(inotify_event);
+							i += event.len;
+						}
+						std::forward<Observer>(receiver).got_element(std::move(changes));
+					}
+				});
 			}
 
 		private:

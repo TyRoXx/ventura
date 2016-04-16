@@ -1,14 +1,14 @@
 #ifndef VENTURA_ABSOLUTE_PATH_HPP
 #define VENTURA_ABSOLUTE_PATH_HPP
 
-#include <ventura/relative_path.hpp>
-#include <ventura/path_segment.hpp>
-#include <silicium/optional.hpp>
-#include <silicium/error_or.hpp>
-#include <silicium/os_string.hpp>
 #include <silicium/c_string.hpp>
+#include <silicium/error_or.hpp>
 #include <silicium/get_last_error.hpp>
+#include <silicium/optional.hpp>
+#include <silicium/os_string.hpp>
 #include <silicium/sink/sink.hpp>
+#include <ventura/path_segment.hpp>
+#include <ventura/relative_path.hpp>
 #ifdef _WIN32
 #include <silicium/win32/win32.hpp>
 #endif
@@ -251,7 +251,7 @@ namespace ventura
 
 	template <std::size_t N>
 	SILICIUM_USE_RESULT inline absolute_path operator/(absolute_path const &front,
-	                                                   absolute_path::char_type const(&literal)[N])
+	                                                   absolute_path::char_type const (&literal)[N])
 	{
 		return front / relative_path(boost::filesystem::path(&literal[0]));
 	}

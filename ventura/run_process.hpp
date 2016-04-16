@@ -32,19 +32,65 @@ namespace ventura
 
 namespace ventura
 {
+	namespace detail
+	{
+		inline Si::error_or<Si::pipe> make_pipe() BOOST_NOEXCEPT
+		{
+#ifdef _WIN32
+			SECURITY_ATTRIBUTES security = {};
+			security.nLength = sizeof(security);
+			security.bInheritHandle = FALSE;
+			HANDLE read, write;
+			if (!CreatePipe(&read, &write, &security, 0))
+			{
+				return Si::get_last_error();
+			}
+			Si::pipe result;
+			result.read = Si::file_handle(read);
+			result.write = Si::file_handle(write);
+			return std::move(result);
+#else
+			return Si::make_pipe();
+#endif
+		}
+
+		inline Si::file_handle enable_inheritance(Si::file_handle original)
+		{
+#ifdef _WIN32
+			HANDLE enabled = INVALID_HANDLE_VALUE;
+			if (!DuplicateHandle(GetCurrentProcess(), original.release(), GetCurrentProcess(), &enabled, 0, TRUE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+			{
+				assert(enabled == INVALID_HANDLE_VALUE);
+				Si::throw_last_error();
+			}
+			return Si::file_handle(enabled);
+#else
+			return original;
+#endif
+		}
+	}
+
 	inline Si::error_or<int> run_process(process_parameters const &parameters)
 	{
 		async_process_parameters async_parameters;
 		async_parameters.executable = parameters.executable;
 		async_parameters.arguments = parameters.arguments;
 		async_parameters.current_path = parameters.current_path;
-		auto input = Si::make_pipe().move_value();
-		auto std_output = Si::make_pipe().move_value();
-		auto std_error = Si::make_pipe().move_value();
+		auto input = detail::make_pipe().move_value();
+		auto std_output = detail::make_pipe().move_value();
+		auto std_error = detail::make_pipe().move_value();
+
+		Si::file_handle inheritable_stdin_read = detail::enable_inheritance(std::move(input.read));
+		Si::file_handle inheritable_stdout_write = detail::enable_inheritance(std::move(std_output.write));
+		Si::file_handle inheritable_stderr_write = detail::enable_inheritance(std::move(std_error.write));
 		async_process process =
-		    launch_process(async_parameters, input.read.handle, std_output.write.handle, std_error.write.handle,
+		    launch_process(async_parameters, inheritable_stdin_read.handle, inheritable_stdout_write.handle, inheritable_stderr_write.handle,
 		                   parameters.additional_environment, parameters.inheritance)
 		        .move_value();
+
+		inheritable_stdin_read.close();
+		inheritable_stdout_write.close();
+		inheritable_stderr_write.close();
 
 		boost::asio::io_service io;
 
@@ -56,18 +102,14 @@ namespace ventura
 		    {
 			    return Si::make_iterator_range(&parameters.out, &parameters.out + (parameters.out != nullptr));
 			});
-		experimental::read_from_anonymous_pipe(io, std_output_consumer, std::move(std_output.read), stopped_polling);
+		auto stdout_finished = experimental::read_from_anonymous_pipe(io, std_output_consumer, std::move(std_output.read), stopped_polling);
 
 		auto std_error_consumer = Si::make_multi_sink<char, Si::success>(
 		    [&parameters]()
 		    {
 			    return Si::make_iterator_range(&parameters.err, &parameters.err + (parameters.err != nullptr));
 			});
-		experimental::read_from_anonymous_pipe(io, std_error_consumer, std::move(std_error.read), stopped_polling);
-
-		input.read.close();
-		std_output.write.close();
-		std_error.write.close();
+		auto stderr_finished = experimental::read_from_anonymous_pipe(io, std_error_consumer, std::move(std_error.read), stopped_polling);
 
 		auto copy_input = std::async(std::launch::async, [&input, &parameters]()
 		                             {
@@ -91,19 +133,21 @@ namespace ventura
 				                             }
 				                             assert(written.get() == 1);
 			                             }
+										 BOOL flushed = FlushFileBuffers(input.write.handle);
 			                             input.write.close();
 			                         });
 
 #ifdef _WIN32
-		std::future<Si::error_or<int>> waited = std::async(std::launch::deferred, [&process, &stop_polling, &io]()
+		std::future<Si::error_or<int>> waited = std::async(std::launch::async, [&process, &io]()
 		                                                   {
 			                                                   Si::error_or<int> rc = process.wait_for_exit();
 			                                                   io.stop();
-			                                                   stop_polling.set_value();
 			                                                   return rc;
 			                                               });
 		io.run();
 		copy_input.get();
+		stdout_finished.get();
+		stderr_finished.get();
 		return waited.get();
 #else
 		io.run();

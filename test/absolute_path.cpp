@@ -1,9 +1,9 @@
-#include <ventura/file_operations.hpp>
-#include <silicium/os_string.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/unordered_map.hpp>
-#include <unordered_map>
 #include <map>
+#include <silicium/os_string.hpp>
+#include <unordered_map>
+#include <ventura/file_operations.hpp>
 
 #ifdef _WIN32
 #define SILICIUM_TEST_ROOT "C:/"

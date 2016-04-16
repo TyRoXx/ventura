@@ -1,8 +1,8 @@
-#include <ventura/relative_path.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/unordered_map.hpp>
-#include <unordered_map>
 #include <map>
+#include <unordered_map>
+#include <ventura/relative_path.hpp>
 
 BOOST_AUTO_TEST_CASE(relative_path_empty)
 {

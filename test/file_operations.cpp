@@ -1,8 +1,8 @@
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/test/unit_test.hpp>
+#include <fstream>
 #include <ventura/file_operations.hpp>
 #include <ventura/write_file.hpp>
-#include <boost/test/unit_test.hpp>
-#include <boost/algorithm/string/predicate.hpp>
-#include <fstream>
 
 #if VENTURA_HAS_ABSOLUTE_PATH_OPERATIONS
 

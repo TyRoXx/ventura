@@ -1,16 +1,16 @@
-#include <ventura/async_process.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/test/unit_test.hpp>
+#include <silicium/environment_variables.hpp>
+#include <silicium/observable/ref.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/spawn_observable.hpp>
-#include <silicium/observable/transform.hpp>
-#include <silicium/observable/ref.hpp>
 #include <silicium/observable/thread.hpp>
+#include <silicium/observable/transform.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/std_threading.hpp>
-#include <silicium/environment_variables.hpp>
-#include <ventura/run_process.hpp>
+#include <ventura/async_process.hpp>
 #include <ventura/file_operations.hpp>
-#include <boost/test/unit_test.hpp>
-#include <boost/assign/list_of.hpp>
+#include <ventura/run_process.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
 #include <boost/filesystem/operations.hpp>
@@ -117,8 +117,7 @@ BOOST_AUTO_TEST_CASE(async_process_executable_not_found)
 
 	BOOST_CHECK_EXCEPTION(run_process(parameters, std::vector<std::pair<Si::os_char const *, Si::os_char const *>>(),
 	                                  ventura::environment_inheritance::no_inherit),
-	                      boost::system::system_error, [](boost::system::system_error const &ex)
-	                      {
+	                      boost::system::system_error, [](boost::system::system_error const &ex) {
 		                      return ex.code() == boost::system::errc::no_such_file_or_directory;
 		                  });
 }

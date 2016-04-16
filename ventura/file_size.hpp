@@ -1,8 +1,8 @@
 #ifndef VENTURA_FILE_SIZE_HPP
 #define VENTURA_FILE_SIZE_HPP
 
-#include <silicium/file_handle.hpp>
 #include <silicium/error_or.hpp>
+#include <silicium/file_handle.hpp>
 #include <silicium/get_last_error.hpp>
 
 #ifndef _WIN32

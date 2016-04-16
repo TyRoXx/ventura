@@ -1,10 +1,10 @@
-#include <ventura/run_process.hpp>
-#include <silicium/to_unique.hpp>
-#include <ventura/file_operations.hpp>
+#include <boost/test/unit_test.hpp>
 #include <silicium/sink/iterator_sink.hpp>
 #include <silicium/sink/virtualized_sink.hpp>
 #include <silicium/source/range_source.hpp>
-#include <boost/test/unit_test.hpp>
+#include <silicium/to_unique.hpp>
+#include <ventura/file_operations.hpp>
+#include <ventura/run_process.hpp>
 #if VENTURA_HAS_RUN_PROCESS
 #include <boost/filesystem/operations.hpp>
 #endif
@@ -64,18 +64,31 @@ namespace Si
 		parameters.executable = absolute_root / "does-not-exist";
 		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
 		BOOST_CHECK_EXCEPTION(ventura::run_process(parameters).get(), boost::system::system_error,
-		                      [](boost::system::system_error const &e)
-		                      {
+		                      [](boost::system::system_error const &e) {
 			                      return e.code() ==
 			                             boost::system::error_code(ENOENT, boost::system::system_category());
 			                  });
 	}
 
-#ifndef _WIN32
-	BOOST_AUTO_TEST_CASE(run_process_standard_input)
+	BOOST_AUTO_TEST_CASE(run_process_standard_input_empty)
 	{
 		ventura::process_parameters parameters;
-		parameters.executable = *ventura::absolute_path::create("/bin/cat");
+		parameters.executable = *ventura::absolute_path::create(VENTURA_TEST_CAT);
+		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
+		auto message = Si::make_c_str_range("");
+		auto input = Si::Source<char>::erase(Si::make_range_source(message));
+		parameters.in = &input;
+		std::vector<char> output_buffer;
+		auto output = Si::Sink<char>::erase(Si::make_container_sink(output_buffer));
+		parameters.out = &output;
+		BOOST_CHECK_EQUAL(0, ventura::run_process(parameters));
+		BOOST_CHECK_EQUAL_COLLECTIONS(message.begin(), message.end(), output_buffer.begin(), output_buffer.end());
+	}
+
+	BOOST_AUTO_TEST_CASE(run_process_standard_input_small)
+	{
+		ventura::process_parameters parameters;
+		parameters.executable = *ventura::absolute_path::create(VENTURA_TEST_CAT);
 		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
 		auto message = Si::make_c_str_range("Hello, cat");
 		auto input = Si::Source<char>::erase(Si::make_range_source(message));
@@ -86,7 +99,36 @@ namespace Si
 		BOOST_CHECK_EQUAL(0, ventura::run_process(parameters));
 		BOOST_CHECK_EQUAL_COLLECTIONS(message.begin(), message.end(), output_buffer.begin(), output_buffer.end());
 	}
-#endif
 
+	BOOST_AUTO_TEST_CASE(run_process_standard_input_line_feed)
+	{
+		ventura::process_parameters parameters;
+		parameters.executable = *ventura::absolute_path::create(VENTURA_TEST_CAT);
+		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
+		auto message = Si::make_c_str_range("Hello,\ncat\n");
+		auto input = Si::Source<char>::erase(Si::make_range_source(message));
+		parameters.in = &input;
+		std::vector<char> output_buffer;
+		auto output = Si::Sink<char>::erase(Si::make_container_sink(output_buffer));
+		parameters.out = &output;
+		BOOST_CHECK_EQUAL(0, ventura::run_process(parameters));
+		BOOST_CHECK_EQUAL_COLLECTIONS(message.begin(), message.end(), output_buffer.begin(), output_buffer.end());
+	}
+
+	BOOST_AUTO_TEST_CASE(run_process_standard_input_large)
+	{
+		ventura::process_parameters parameters;
+		parameters.executable = *ventura::absolute_path::create(VENTURA_TEST_CAT);
+		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
+		std::vector<char> message;
+		std::generate_n(std::back_inserter(message), 10000, []() { return static_cast<char>(std::rand()); });
+		auto input = Si::Source<char>::erase(Si::make_range_source(Si::make_memory_range(message)));
+		parameters.in = &input;
+		std::vector<char> output_buffer;
+		auto output = Si::Sink<char>::erase(Si::make_container_sink(output_buffer));
+		parameters.out = &output;
+		BOOST_CHECK_EQUAL(0, ventura::run_process(parameters));
+		BOOST_CHECK_EQUAL_COLLECTIONS(message.begin(), message.end(), output_buffer.begin(), output_buffer.end());
+	}
 #endif
 }

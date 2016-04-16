@@ -1,8 +1,8 @@
 #ifndef VENTURA_LINUX_INOTIFY_WATCH_DESCRIPTOR_HPP
 #define VENTURA_LINUX_INOTIFY_WATCH_DESCRIPTOR_HPP
 
-#include <silicium/config.hpp>
 #include <boost/swap.hpp>
+#include <silicium/config.hpp>
 #include <sys/inotify.h>
 
 namespace ventura

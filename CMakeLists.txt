@@ -163,6 +163,7 @@ endif()
 
 include_directories(".")
 
+add_subdirectory("test_programs")
 add_subdirectory("test")
 add_subdirectory("examples")
 

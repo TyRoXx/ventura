@@ -1,17 +1,17 @@
 #ifndef VENTURA_FILE_OPERATIONS_HPP
 #define VENTURA_FILE_OPERATIONS_HPP
 
+#include <silicium/arithmetic/add.hpp>
 #include <silicium/error_handler.hpp>
-#include <ventura/run_process.hpp>
+#include <silicium/identity.hpp>
+#include <silicium/read.hpp>
 #include <ventura/file_size.hpp>
 #include <ventura/open.hpp>
-#include <silicium/read.hpp>
-#include <silicium/identity.hpp>
-#include <silicium/arithmetic/add.hpp>
+#include <ventura/run_process.hpp>
 #ifdef _WIN32
-#include <silicium/win32/win32.hpp>
 #include <Shellapi.h>
 #include <shlobj.h>
+#include <silicium/win32/win32.hpp>
 #undef interface
 #else
 #include <pwd.h>
@@ -28,8 +28,8 @@
 #include <boost/filesystem/operations.hpp>
 #endif
 
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 
 namespace ventura
@@ -414,10 +414,7 @@ namespace ventura
 	{
 		std::vector<char> content;
 		boost::uint64_t size =
-		    ventura::file_size(file).get().or_throw([]
-		                                            {
-			                                            throw std::runtime_error("Expected file to have a size");
-			                                        });
+		    ventura::file_size(file).get().or_throw([] { throw std::runtime_error("Expected file to have a size"); });
 		if (size > content.max_size())
 		{
 			throw std::bad_alloc();
@@ -457,11 +454,9 @@ namespace ventura
 			throw std::runtime_error("Could not get home");
 		}
 		std::unique_ptr<wchar_t, detail::co_task_mem_deleter> raii_path(path);
-		return absolute_path::create(raii_path.get())
-		    .or_throw([]
-		              {
-			              throw std::runtime_error("Windows returned a non-absolute path for home");
-			          });
+		return absolute_path::create(raii_path.get()).or_throw([] {
+			throw std::runtime_error("Windows returned a non-absolute path for home");
+		});
 	}
 #else
 	inline absolute_path get_home()

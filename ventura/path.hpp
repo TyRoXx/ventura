@@ -1,10 +1,10 @@
 #ifndef VENTURA_PATH_HPP
 #define VENTURA_PATH_HPP
 
-#include <ventura/path_char.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/functional/hash.hpp>
 #include <silicium/noexcept_string.hpp>
-#include <boost/filesystem/path.hpp>
+#include <ventura/path_char.hpp>
 
 namespace ventura
 {
@@ -44,7 +44,7 @@ namespace ventura
 		}
 
 		template <std::size_t N>
-		path(char_type const(&c_str_literal)[N])
+		path(char_type const (&c_str_literal)[N])
 		    : m_value(c_str_literal)
 		{
 			normalize_slashes();

@@ -1,10 +1,10 @@
 #ifndef VENTURA_READ_FILE_HPP
 #define VENTURA_READ_FILE_HPP
 
-#include <ventura/open.hpp>
-#include <ventura/file_size.hpp>
 #include <silicium/read.hpp>
 #include <silicium/variant.hpp>
+#include <ventura/file_size.hpp>
+#include <ventura/open.hpp>
 
 namespace ventura
 {

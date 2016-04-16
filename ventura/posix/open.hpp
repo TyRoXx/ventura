@@ -1,9 +1,9 @@
 #ifndef VENTURA_LINUX_OPEN_HPP
 #define VENTURA_LINUX_OPEN_HPP
 
+#include <silicium/c_string.hpp>
 #include <silicium/error_or.hpp>
 #include <silicium/file_handle.hpp>
-#include <silicium/c_string.hpp>
 #include <ventura/absolute_path.hpp>
 
 #if defined(__unix) || defined(__APPLE__)

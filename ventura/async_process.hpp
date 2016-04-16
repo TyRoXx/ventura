@@ -1,25 +1,25 @@
 #ifndef VENTURA_ASYNC_PROCESS_HPP
 #define VENTURA_ASYNC_PROCESS_HPP
 
-#include <silicium/os_string.hpp>
-#include <ventura/absolute_path.hpp>
-#include <ventura/process_parameters.hpp>
+#include <boost/thread/future.hpp>
+#include <boost/thread/thread.hpp>
+#include <silicium/asio/posting_observable.hpp>
+#include <silicium/asio/process_output.hpp>
 #include <silicium/file_handle.hpp>
-#include <silicium/process_handle.hpp>
-#include <silicium/pipe.hpp>
-#include <silicium/observable/virtualized.hpp>
+#include <silicium/observable/ref.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/observable/thread.hpp>
-#include <silicium/observable/ref.hpp>
-#include <silicium/sink/buffering_sink.hpp>
-#include <ventura/absolute_path.hpp>
-#include <silicium/asio/posting_observable.hpp>
-#include <silicium/asio/process_output.hpp>
-#include <silicium/std_threading.hpp>
+#include <silicium/observable/virtualized.hpp>
+#include <silicium/os_string.hpp>
+#include <silicium/pipe.hpp>
+#include <silicium/process_handle.hpp>
 #include <silicium/sink/append.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/thread/future.hpp>
+#include <silicium/sink/buffering_sink.hpp>
+#include <silicium/std_threading.hpp>
+#include <ventura/absolute_path.hpp>
+#include <ventura/absolute_path.hpp>
+#include <ventura/process_parameters.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
 #include <boost/filesystem/operations.hpp>
@@ -160,10 +160,6 @@ namespace ventura
 		all_arguments.insert(all_arguments.end(), parameters.arguments.begin(), parameters.arguments.end());
 		Si::win32::winapi_string command_line = detail::build_command_line(all_arguments);
 
-		SECURITY_ATTRIBUTES security = {};
-		security.nLength = sizeof(security);
-		security.bInheritHandle = TRUE;
-
 		STARTUPINFOW startup = {};
 		startup.cb = sizeof(startup);
 		startup.dwFlags |= STARTF_USESTDHANDLES;
@@ -229,8 +225,7 @@ namespace ventura
 
 			typedef std::pair<Si::os_char const *, Si::os_char const *> environment_entry;
 			std::sort(environment.begin(), environment.end(),
-			          [](environment_entry const &left, environment_entry const &right)
-			          {
+			          [](environment_entry const &left, environment_entry const &right) {
 				          return (wcscmp(left.first, right.first) < 0);
 				      });
 			for (environment_entry const &entry : environment)
@@ -270,7 +265,7 @@ namespace ventura
 		}
 
 		PROCESS_INFORMATION process = {};
-		if (!CreateProcessW(detail::to_create_process_path(parameters.executable).c_str(), &command_line[0], &security,
+		if (!CreateProcessW(detail::to_create_process_path(parameters.executable).c_str(), &command_line[0], nullptr,
 		                    nullptr, TRUE, flags, environment_block.empty() ? NULL : environment_block.data(),
 		                    detail::to_create_process_path(parameters.current_path).c_str(), &startup, &process))
 		{
@@ -293,10 +288,7 @@ namespace ventura
 		std::vector<char *> argument_pointers;
 		argument_pointers.emplace_back(const_cast<char *>(executable.c_str()));
 		std::transform(begin(arguments), end(arguments), std::back_inserter(argument_pointers),
-		               [](Si::noexcept_string &arg)
-		               {
-			               return &arg[0];
-			           });
+		               [](Si::noexcept_string &arg) { return &arg[0]; });
 		argument_pointers.emplace_back(nullptr);
 
 		Si::pipe child_error = Si::make_pipe().move_value();
@@ -310,8 +302,7 @@ namespace ventura
 		// child
 		if (forked == 0)
 		{
-			auto const fail_with_error = [&child_error](int error) SILICIUM_NORETURN
-			{
+			auto const fail_with_error = [&child_error](int error) SILICIUM_NORETURN {
 				ssize_t written = write(child_error.write.handle, &error, sizeof(error));
 				if (written != sizeof(error))
 				{
@@ -321,10 +312,7 @@ namespace ventura
 				_exit(0);
 			};
 
-			auto const fail = [fail_with_error]() SILICIUM_NORETURN
-			{
-				fail_with_error(errno);
-			};
+			auto const fail = [fail_with_error]() SILICIUM_NORETURN { fail_with_error(errno); };
 
 			if (dup2(standard_output, STDOUT_FILENO) < 0)
 			{
@@ -490,44 +478,46 @@ namespace ventura
 #if VENTURA_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
 		// TODO: find a more generic API for reading from a pipe portably
 		template <class CharSink>
-		void read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination, Si::file_handle file,
-		                              boost::shared_future<void> stop_polling)
+		boost::unique_future<void> read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination,
+		                                                    Si::file_handle file,
+		                                                    boost::shared_future<void> stop_polling)
 		{
+			auto finished = std::make_shared<boost::promise<void>>();
 #ifdef _WIN32
 			auto copyable_file = Si::to_shared(std::move(file));
 			auto work = std::make_shared<boost::asio::io_service::work>(io);
 			auto stop_polling_shared = Si::to_shared(std::move(stop_polling));
 			Si::spawn_observable(Si::asio::make_posting_observable(
 			    io, Si::make_thread_observable<Si::std_threading>(
-			            [work, copyable_file, destination, stop_polling_shared]()
-			            {
+			            [work, copyable_file, destination, stop_polling_shared, finished]() {
 				            win32::copy_whole_pipe(copyable_file->handle, destination, std::move(*stop_polling_shared));
+				            finished->set_value();
 				            return Si::unit();
 				        })));
 #elif SILICIUM_HAS_SPAWN_COROUTINE
 			boost::ignore_unused_variable_warning(stop_polling);
 			auto copyable_file = Si::to_shared(std::move(file));
-			Si::spawn_coroutine([&io, destination, copyable_file](Si::spawn_context yield)
-			                    {
-				                    Si::process_output output_reader(
-				                        Si::make_unique<Si::process_output::stream>(io, copyable_file->handle));
-				                    copyable_file->release();
-				                    for (;;)
-				                    {
-					                    auto piece = yield.get_one(Si::ref(output_reader));
-					                    assert(piece);
-					                    if (piece->is_error())
-					                    {
-						                    break;
-					                    }
-					                    Si::memory_range data = piece->get();
-					                    if (data.empty())
-					                    {
-						                    break;
-					                    }
-					                    Si::append(destination, data);
-				                    }
-				                });
+			Si::spawn_coroutine([&io, destination, copyable_file, finished](Si::spawn_context yield) {
+				Si::process_output output_reader(
+				    Si::make_unique<Si::process_output::stream>(io, copyable_file->handle));
+				copyable_file->release();
+				for (;;)
+				{
+					auto piece = yield.get_one(Si::ref(output_reader));
+					assert(piece);
+					if (piece->is_error())
+					{
+						break;
+					}
+					Si::memory_range data = piece->get();
+					if (data.empty())
+					{
+						break;
+					}
+					Si::append(destination, data);
+				}
+				finished->set_value();
+			});
 #else
 			boost::ignore_unused_variable_warning(stop_polling);
 			typedef typename std::decay<CharSink>::type clean_destination;
@@ -543,21 +533,20 @@ namespace ventura
 				void start()
 				{
 					auto this_ = this->shared_from_this();
-					m_output.async_get_one(Si::make_function_observer([this_](optional<error_or<memory_range>> piece)
-					                                                  {
-						                                                  assert(piece);
-						                                                  if (piece->is_error())
-						                                                  {
-							                                                  return;
-						                                                  }
-						                                                  Si::memory_range data = piece->get();
-						                                                  if (data.empty())
-						                                                  {
-							                                                  return;
-						                                                  }
-						                                                  Si::append(this_->m_destination, data);
-						                                                  this_->start();
-						                                              }));
+					m_output.async_get_one(Si::make_function_observer([this_](optional<error_or<memory_range>> piece) {
+						assert(piece);
+						if (piece->is_error())
+						{
+							return;
+						}
+						Si::memory_range data = piece->get();
+						if (data.empty())
+						{
+							return;
+						}
+						Si::append(this_->m_destination, data);
+						this_->start();
+					}));
 				}
 
 			private:
@@ -566,7 +555,11 @@ namespace ventura
 			};
 			auto reader = std::make_shared<pipe_reader>(io, std::move(file), std::forward<CharSink>(destination));
 			reader->start();
+
+			// TODO whatever.. rewrite this mess
+			finished->set_value();
 #endif
+			return finished->get_future();
 		}
 #endif
 	}

@@ -1,8 +1,8 @@
+#include <boost/test/unit_test.hpp>
+#include <silicium/sink/append.hpp>
 #include <ventura/file_size.hpp>
 #include <ventura/open.hpp>
 #include <ventura/sink/file_sink.hpp>
-#include <silicium/sink/append.hpp>
-#include <boost/test/unit_test.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
 #include <boost/filesystem/operations.hpp>

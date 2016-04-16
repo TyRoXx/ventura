@@ -1,9 +1,9 @@
 #ifndef VENTURA_PATH_SEGMENT_HPP
 #define VENTURA_PATH_SEGMENT_HPP
 
-#include <ventura/path.hpp>
-#include <silicium/optional.hpp>
 #include <boost/filesystem/path.hpp>
+#include <silicium/optional.hpp>
+#include <ventura/path.hpp>
 
 namespace ventura
 {
