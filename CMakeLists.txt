@@ -123,7 +123,7 @@ else()
 	include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 	link_directories(${Boost_LIBRARY_DIR})
 
-	set(SILICIUM_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/dependencies/silicium CACHE TYPE PATH)
+	set(SILICIUM_INCLUDE_DIR "" CACHE TYPE PATH)
 	include_directories(${SILICIUM_INCLUDE_DIR})
 endif()
 
