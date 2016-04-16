@@ -64,7 +64,8 @@ namespace Si
 		parameters.executable = absolute_root / "does-not-exist";
 		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
 		BOOST_CHECK_EXCEPTION(ventura::run_process(parameters).get(), boost::system::system_error,
-		                      [](boost::system::system_error const &e) {
+		                      [](boost::system::system_error const &e)
+		                      {
 			                      return e.code() ==
 			                             boost::system::error_code(ENOENT, boost::system::system_category());
 			                  });
@@ -121,7 +122,10 @@ namespace Si
 		parameters.executable = *ventura::absolute_path::create(VENTURA_TEST_CAT);
 		parameters.current_path = ventura::get_current_working_directory(Si::throw_);
 		std::vector<char> message;
-		std::generate_n(std::back_inserter(message), 10000, []() { return static_cast<char>(std::rand()); });
+		std::generate_n(std::back_inserter(message), 10000, []()
+		                {
+			                return static_cast<char>(std::rand());
+			            });
 		auto input = Si::Source<char>::erase(Si::make_range_source(Si::make_memory_range(message)));
 		parameters.in = &input;
 		std::vector<char> output_buffer;

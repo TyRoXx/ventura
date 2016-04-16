@@ -251,7 +251,7 @@ namespace ventura
 
 	template <std::size_t N>
 	SILICIUM_USE_RESULT inline absolute_path operator/(absolute_path const &front,
-	                                                   absolute_path::char_type const (&literal)[N])
+	                                                   absolute_path::char_type const(&literal)[N])
 	{
 		return front / relative_path(boost::filesystem::path(&literal[0]));
 	}

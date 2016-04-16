@@ -414,7 +414,10 @@ namespace ventura
 	{
 		std::vector<char> content;
 		boost::uint64_t size =
-		    ventura::file_size(file).get().or_throw([] { throw std::runtime_error("Expected file to have a size"); });
+		    ventura::file_size(file).get().or_throw([]
+		                                            {
+			                                            throw std::runtime_error("Expected file to have a size");
+			                                        });
 		if (size > content.max_size())
 		{
 			throw std::bad_alloc();
@@ -454,9 +457,11 @@ namespace ventura
 			throw std::runtime_error("Could not get home");
 		}
 		std::unique_ptr<wchar_t, detail::co_task_mem_deleter> raii_path(path);
-		return absolute_path::create(raii_path.get()).or_throw([] {
-			throw std::runtime_error("Windows returned a non-absolute path for home");
-		});
+		return absolute_path::create(raii_path.get())
+		    .or_throw([]
+		              {
+			              throw std::runtime_error("Windows returned a non-absolute path for home");
+			          });
 	}
 #else
 	inline absolute_path get_home()

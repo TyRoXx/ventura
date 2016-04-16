@@ -118,11 +118,12 @@ BOOST_AUTO_TEST_CASE(file_sink_writev)
 	writes.emplace_back(Si::make_memory_range(payload));
 	writes.emplace_back(Si::make_memory_range(payload));
 
-	auto writer = boost::async([&]() {
-		auto error = sink.append(Si::make_contiguous_range(writes));
-		BOOST_CHECK(!error);
-		buffer.write.close();
-	});
+	auto writer = boost::async([&]()
+	                           {
+		                           auto error = sink.append(Si::make_contiguous_range(writes));
+		                           BOOST_CHECK(!error);
+		                           buffer.write.close();
+		                       });
 
 	std::vector<char> all_read;
 	for (;;)
@@ -137,7 +138,10 @@ BOOST_AUTO_TEST_CASE(file_sink_writev)
 	}
 
 	BOOST_CHECK_EQUAL(payload.size() * 3, all_read.size());
-	BOOST_CHECK(std::all_of(all_read.begin(), all_read.end(), [](char c) { return c == 'a'; }));
+	BOOST_CHECK(std::all_of(all_read.begin(), all_read.end(), [](char c)
+	                        {
+		                        return c == 'a';
+		                    }));
 
 	writer.get();
 }

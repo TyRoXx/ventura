@@ -58,7 +58,8 @@ namespace ventura
 		{
 #ifdef _WIN32
 			HANDLE enabled = INVALID_HANDLE_VALUE;
-			if (!DuplicateHandle(GetCurrentProcess(), original.release(), GetCurrentProcess(), &enabled, 0, TRUE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+			if (!DuplicateHandle(GetCurrentProcess(), original.release(), GetCurrentProcess(), &enabled, 0, TRUE,
+			                     DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 			{
 				assert(enabled == INVALID_HANDLE_VALUE);
 				Si::throw_last_error();
@@ -84,8 +85,8 @@ namespace ventura
 		Si::file_handle inheritable_stdout_write = detail::enable_inheritance(std::move(std_output.write));
 		Si::file_handle inheritable_stderr_write = detail::enable_inheritance(std::move(std_error.write));
 		async_process process =
-		    launch_process(async_parameters, inheritable_stdin_read.handle, inheritable_stdout_write.handle, inheritable_stderr_write.handle,
-		                   parameters.additional_environment, parameters.inheritance)
+		    launch_process(async_parameters, inheritable_stdin_read.handle, inheritable_stdout_write.handle,
+		                   inheritable_stderr_write.handle, parameters.additional_environment, parameters.inheritance)
 		        .move_value();
 
 		inheritable_stdin_read.close();
@@ -102,14 +103,16 @@ namespace ventura
 		    {
 			    return Si::make_iterator_range(&parameters.out, &parameters.out + (parameters.out != nullptr));
 			});
-		auto stdout_finished = experimental::read_from_anonymous_pipe(io, std_output_consumer, std::move(std_output.read), stopped_polling);
+		auto stdout_finished = experimental::read_from_anonymous_pipe(io, std_output_consumer,
+		                                                              std::move(std_output.read), stopped_polling);
 
 		auto std_error_consumer = Si::make_multi_sink<char, Si::success>(
 		    [&parameters]()
 		    {
 			    return Si::make_iterator_range(&parameters.err, &parameters.err + (parameters.err != nullptr));
 			});
-		auto stderr_finished = experimental::read_from_anonymous_pipe(io, std_error_consumer, std::move(std_error.read), stopped_polling);
+		auto stderr_finished =
+		    experimental::read_from_anonymous_pipe(io, std_error_consumer, std::move(std_error.read), stopped_polling);
 
 		auto copy_input = std::async(std::launch::async, [&input, &parameters]()
 		                             {
@@ -134,8 +137,8 @@ namespace ventura
 				                             assert(written.get() == 1);
 			                             }
 #ifdef _WIN32
-										 //do not know whether this is necessary
-										 BOOL flushed = FlushFileBuffers(input.write.handle);
+			                             // do not know whether this is necessary
+			                             BOOL flushed = FlushFileBuffers(input.write.handle);
 #endif
 			                             input.write.close();
 			                         });

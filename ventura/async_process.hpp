@@ -225,7 +225,8 @@ namespace ventura
 
 			typedef std::pair<Si::os_char const *, Si::os_char const *> environment_entry;
 			std::sort(environment.begin(), environment.end(),
-			          [](environment_entry const &left, environment_entry const &right) {
+			          [](environment_entry const &left, environment_entry const &right)
+			          {
 				          return (wcscmp(left.first, right.first) < 0);
 				      });
 			for (environment_entry const &entry : environment)
@@ -288,7 +289,10 @@ namespace ventura
 		std::vector<char *> argument_pointers;
 		argument_pointers.emplace_back(const_cast<char *>(executable.c_str()));
 		std::transform(begin(arguments), end(arguments), std::back_inserter(argument_pointers),
-		               [](Si::noexcept_string &arg) { return &arg[0]; });
+		               [](Si::noexcept_string &arg)
+		               {
+			               return &arg[0];
+			           });
 		argument_pointers.emplace_back(nullptr);
 
 		Si::pipe child_error = Si::make_pipe().move_value();
@@ -302,7 +306,8 @@ namespace ventura
 		// child
 		if (forked == 0)
 		{
-			auto const fail_with_error = [&child_error](int error) SILICIUM_NORETURN {
+			auto const fail_with_error = [&child_error](int error) SILICIUM_NORETURN
+			{
 				ssize_t written = write(child_error.write.handle, &error, sizeof(error));
 				if (written != sizeof(error))
 				{
@@ -312,7 +317,10 @@ namespace ventura
 				_exit(0);
 			};
 
-			auto const fail = [fail_with_error]() SILICIUM_NORETURN { fail_with_error(errno); };
+			auto const fail = [fail_with_error]() SILICIUM_NORETURN
+			{
+				fail_with_error(errno);
+			};
 
 			if (dup2(standard_output, STDOUT_FILENO) < 0)
 			{
@@ -489,7 +497,8 @@ namespace ventura
 			auto stop_polling_shared = Si::to_shared(std::move(stop_polling));
 			Si::spawn_observable(Si::asio::make_posting_observable(
 			    io, Si::make_thread_observable<Si::std_threading>(
-			            [work, copyable_file, destination, stop_polling_shared, finished]() {
+			            [work, copyable_file, destination, stop_polling_shared, finished]()
+			            {
 				            win32::copy_whole_pipe(copyable_file->handle, destination, std::move(*stop_polling_shared));
 				            finished->set_value();
 				            return Si::unit();
@@ -497,27 +506,28 @@ namespace ventura
 #elif SILICIUM_HAS_SPAWN_COROUTINE
 			boost::ignore_unused_variable_warning(stop_polling);
 			auto copyable_file = Si::to_shared(std::move(file));
-			Si::spawn_coroutine([&io, destination, copyable_file, finished](Si::spawn_context yield) {
-				Si::process_output output_reader(
-				    Si::make_unique<Si::process_output::stream>(io, copyable_file->handle));
-				copyable_file->release();
-				for (;;)
-				{
-					auto piece = yield.get_one(Si::ref(output_reader));
-					assert(piece);
-					if (piece->is_error())
-					{
-						break;
-					}
-					Si::memory_range data = piece->get();
-					if (data.empty())
-					{
-						break;
-					}
-					Si::append(destination, data);
-				}
-				finished->set_value();
-			});
+			Si::spawn_coroutine([&io, destination, copyable_file, finished](Si::spawn_context yield)
+			                    {
+				                    Si::process_output output_reader(
+				                        Si::make_unique<Si::process_output::stream>(io, copyable_file->handle));
+				                    copyable_file->release();
+				                    for (;;)
+				                    {
+					                    auto piece = yield.get_one(Si::ref(output_reader));
+					                    assert(piece);
+					                    if (piece->is_error())
+					                    {
+						                    break;
+					                    }
+					                    Si::memory_range data = piece->get();
+					                    if (data.empty())
+					                    {
+						                    break;
+					                    }
+					                    Si::append(destination, data);
+				                    }
+				                    finished->set_value();
+				                });
 #else
 			boost::ignore_unused_variable_warning(stop_polling);
 			typedef typename std::decay<CharSink>::type clean_destination;
@@ -533,20 +543,21 @@ namespace ventura
 				void start()
 				{
 					auto this_ = this->shared_from_this();
-					m_output.async_get_one(Si::make_function_observer([this_](optional<error_or<memory_range>> piece) {
-						assert(piece);
-						if (piece->is_error())
-						{
-							return;
-						}
-						Si::memory_range data = piece->get();
-						if (data.empty())
-						{
-							return;
-						}
-						Si::append(this_->m_destination, data);
-						this_->start();
-					}));
+					m_output.async_get_one(Si::make_function_observer([this_](optional<error_or<memory_range>> piece)
+					                                                  {
+						                                                  assert(piece);
+						                                                  if (piece->is_error())
+						                                                  {
+							                                                  return;
+						                                                  }
+						                                                  Si::memory_range data = piece->get();
+						                                                  if (data.empty())
+						                                                  {
+							                                                  return;
+						                                                  }
+						                                                  Si::append(this_->m_destination, data);
+						                                                  this_->start();
+						                                              }));
 				}
 
 			private:

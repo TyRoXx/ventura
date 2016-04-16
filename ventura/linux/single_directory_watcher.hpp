@@ -79,9 +79,11 @@ namespace ventura
 		explicit single_directory_watcher(boost::asio::io_service &io, absolute_path const &watched)
 		    : inotify(io)
 		    , impl(Si::enumerate(Si::ref(inotify)),
-		           [](linux::file_notification &&notification) {
+		           [](linux::file_notification &&notification)
+		           {
 			           return Si::fmap(linux::to_portable_file_notification(std::move(notification), relative_path()),
-			                           [](ventura::file_notification notification) {
+			                           [](ventura::file_notification notification)
+			                           {
 				                           return Si::error_or<ventura::file_notification>(std::move(notification));
 				                       });
 			       })
@@ -94,19 +96,19 @@ namespace ventura
 		void async_get_one(Observer &&receiver)
 		{
 			impl.async_get_one(
-			    Si::function_observer<
-			        std::function<void(Si::optional<Si::error_or<file_notification>>)>>([SILICIUM_CAPTURE_EXPRESSION(
-			        receiver, std::forward<Observer>(receiver))](
-			        Si::optional<Si::error_or<file_notification>> element) mutable {
-				    if (element)
-				    {
-					    std::move(receiver).got_element(std::move(*element));
-				    }
-				    else
-				    {
-					    std::move(receiver).ended();
-				    }
-				}));
+			    Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>(
+			        [SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))](
+			            Si::optional<Si::error_or<file_notification>> element) mutable
+			        {
+				        if (element)
+				        {
+					        std::move(receiver).got_element(std::move(*element));
+				        }
+				        else
+				        {
+					        std::move(receiver).ended();
+				        }
+				    }));
 		}
 
 	private:
@@ -115,8 +117,7 @@ namespace ventura
 		    Si::error_or<file_notification>,
 		    Si::enumerator<Si::ptr_observable<std::vector<linux::file_notification>, linux::inotify_observable *>>,
 		    std::function<Si::optional<Si::error_or<file_notification>>(linux::file_notification &&)>,
-		    Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>>
-		    impl;
+		    Si::function_observer<std::function<void(Si::optional<Si::error_or<file_notification>>)>>> impl;
 		linux::watch_descriptor root;
 	};
 #endif

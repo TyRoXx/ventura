@@ -85,34 +85,36 @@ namespace ventura
 				std::size_t const additional_buffer = 8192;
 				read_buffer.resize(min_buffer_size + additional_buffer);
 				assert(notifier);
-				notifier->async_read_some(boost::asio::buffer(read_buffer), [
-					this, SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver))
-				](boost::system::error_code error, std::size_t bytes_read) mutable {
-					if (error)
-					{
-						if (error == boost::asio::error::operation_aborted)
-						{
-							return;
-						}
-						throw std::logic_error("not implemented");
-					}
-					else
-					{
-						std::vector<file_notification> changes;
-						for (std::size_t i = 0; i < bytes_read;)
-						{
-							inotify_event const &event =
-							    *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
-							Si::optional<path_segment> segment = path_segment::create(
-							    path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')));
-							assert(segment);
-							changes.emplace_back(file_notification{event.mask, std::move(*segment), event.wd});
-							i += sizeof(inotify_event);
-							i += event.len;
-						}
-						std::forward<Observer>(receiver).got_element(std::move(changes));
-					}
-				});
+				notifier->async_read_some(
+				    boost::asio::buffer(read_buffer),
+				    [ this, SILICIUM_CAPTURE_EXPRESSION(receiver, std::forward<Observer>(receiver)) ](
+				        boost::system::error_code error, std::size_t bytes_read) mutable
+				    {
+					    if (error)
+					    {
+						    if (error == boost::asio::error::operation_aborted)
+						    {
+							    return;
+						    }
+						    throw std::logic_error("not implemented");
+					    }
+					    else
+					    {
+						    std::vector<file_notification> changes;
+						    for (std::size_t i = 0; i < bytes_read;)
+						    {
+							    inotify_event const &event =
+							        *reinterpret_cast<inotify_event const *>(read_buffer.data() + i);
+							    Si::optional<path_segment> segment = path_segment::create(
+							        path(event.name + 0, std::find(event.name + 0, event.name + event.len, '\0')));
+							    assert(segment);
+							    changes.emplace_back(file_notification{event.mask, std::move(*segment), event.wd});
+							    i += sizeof(inotify_event);
+							    i += event.len;
+						    }
+						    std::forward<Observer>(receiver).got_element(std::move(changes));
+					    }
+					});
 			}
 
 		private:
