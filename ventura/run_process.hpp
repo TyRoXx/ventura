@@ -141,17 +141,11 @@ namespace ventura
 			                         });
 
 #ifdef _WIN32
-		std::future<Si::error_or<int>> waited = std::async(std::launch::async, [&process, &io]()
-		                                                   {
-			                                                   Si::error_or<int> rc = process.wait_for_exit();
-			                                                   io.stop();
-			                                                   return rc;
-			                                               });
 		io.run();
 		copy_input.get();
 		stdout_finished.get();
 		stderr_finished.get();
-		return waited.get();
+		return process.wait_for_exit();
 #else
 		io.run();
 		copy_input.get();
