@@ -140,17 +140,11 @@ namespace ventura
 			                             input.write.close();
 			                         });
 
-#ifdef _WIN32
 		io.run();
 		copy_input.get();
 		stdout_finished.get();
 		stderr_finished.get();
 		return process.wait_for_exit();
-#else
-		io.run();
-		copy_input.get();
-		return process.wait_for_exit();
-#endif
 	}
 
 #ifdef _WIN32
