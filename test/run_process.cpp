@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(run_process_1_unix_which)
     parameters.arguments.emplace_back("which");
     parameters.current_path = ventura::get_current_working_directory(Si::throw_);
     std::vector<char> out;
-    auto sink = Si::virtualize_sink(make_iterator_sink<char>(std::back_inserter(out)));
+    auto sink = Si::virtualize_sink(Si::make_iterator_sink<char>(std::back_inserter(out)));
     parameters.out = &sink;
     int result = ventura::run_process(parameters).get();
     BOOST_CHECK_EQUAL(0, result);
