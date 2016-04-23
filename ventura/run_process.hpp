@@ -136,10 +136,6 @@ namespace ventura
 				                             }
 				                             assert(written.get() == 1);
 			                             }
-#ifdef _WIN32
-			                             // do not know whether this is necessary
-			                             BOOL flushed = FlushFileBuffers(input.write.handle);
-#endif
 			                             input.write.close();
 			                         });
 
