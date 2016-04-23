@@ -5,32 +5,32 @@
 
 namespace ventura
 {
-	inline Si::native_file_descriptor get_standard_input()
-	{
+    inline Si::native_file_descriptor get_standard_input()
+    {
 #ifdef _WIN32
-		return GetStdHandle(STD_INPUT_HANDLE);
+        return GetStdHandle(STD_INPUT_HANDLE);
 #else
-		return 0;
+        return 0;
 #endif
-	}
+    }
 
-	inline Si::native_file_descriptor get_standard_output()
-	{
+    inline Si::native_file_descriptor get_standard_output()
+    {
 #ifdef _WIN32
-		return GetStdHandle(STD_OUTPUT_HANDLE);
+        return GetStdHandle(STD_OUTPUT_HANDLE);
 #else
-		return 1;
+        return 1;
 #endif
-	}
+    }
 
-	inline Si::native_file_descriptor get_standard_error()
-	{
+    inline Si::native_file_descriptor get_standard_error()
+    {
 #ifdef _WIN32
-		return GetStdHandle(STD_ERROR_HANDLE);
+        return GetStdHandle(STD_ERROR_HANDLE);
 #else
-		return 2;
+        return 2;
 #endif
-	}
+    }
 }
 
 #endif

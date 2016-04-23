@@ -3,9 +3,9 @@
 
 namespace ventura
 {
-	struct flush
-	{
-	};
+    struct flush
+    {
+    };
 }
 
 #endif

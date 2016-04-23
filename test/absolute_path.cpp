@@ -13,196 +13,196 @@
 
 namespace
 {
-	Si::noexcept_string const absolute_root(SILICIUM_TEST_ROOT);
+    Si::noexcept_string const absolute_root(SILICIUM_TEST_ROOT);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_empty)
 {
-	ventura::absolute_path e;
-	BOOST_CHECK_EQUAL("", e.underlying());
-	BOOST_CHECK_EQUAL(boost::filesystem::path(""), e.to_boost_path());
+    ventura::absolute_path e;
+    BOOST_CHECK_EQUAL("", e.underlying());
+    BOOST_CHECK_EQUAL(boost::filesystem::path(""), e.to_boost_path());
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_copy_construction)
 {
-	ventura::absolute_path b = *ventura::absolute_path::create(absolute_root + "b");
-	ventura::absolute_path a(b);
-	BOOST_CHECK_EQUAL(a, b);
-	BOOST_CHECK(absolute_root + "b" == a);
-	BOOST_CHECK(absolute_root + "b" == b);
+    ventura::absolute_path b = *ventura::absolute_path::create(absolute_root + "b");
+    ventura::absolute_path a(b);
+    BOOST_CHECK_EQUAL(a, b);
+    BOOST_CHECK(absolute_root + "b" == a);
+    BOOST_CHECK(absolute_root + "b" == b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_copy_assignment)
 {
-	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b");
-	BOOST_CHECK_NE(a, b);
-	a = b;
-	BOOST_CHECK_EQUAL(a, b);
-	BOOST_CHECK(absolute_root + "b" == a);
-	BOOST_CHECK(absolute_root + "b" == b);
+    ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b");
+    BOOST_CHECK_NE(a, b);
+    a = b;
+    BOOST_CHECK_EQUAL(a, b);
+    BOOST_CHECK(absolute_root + "b" == a);
+    BOOST_CHECK(absolute_root + "b" == b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_move_construction)
 {
-	ventura::absolute_path b = *ventura::absolute_path::create(absolute_root + "b");
-	ventura::absolute_path a(std::move(b));
-	BOOST_CHECK_NE(a, b);
-	BOOST_CHECK(absolute_root + "b" == a);
-	BOOST_CHECK_EQUAL("", b);
+    ventura::absolute_path b = *ventura::absolute_path::create(absolute_root + "b");
+    ventura::absolute_path a(std::move(b));
+    BOOST_CHECK_NE(a, b);
+    BOOST_CHECK(absolute_root + "b" == a);
+    BOOST_CHECK_EQUAL("", b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_move_assignment)
 {
-	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b");
-	BOOST_CHECK_NE(a, b);
-	a = std::move(b);
-	BOOST_CHECK_NE(a, b);
-	BOOST_CHECK(absolute_root + "b" == a);
-	BOOST_CHECK_EQUAL("", b);
+    ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b");
+    BOOST_CHECK_NE(a, b);
+    a = std::move(b);
+    BOOST_CHECK_NE(a, b);
+    BOOST_CHECK(absolute_root + "b" == a);
+    BOOST_CHECK_EQUAL("", b);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_equality)
 {
-	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b"),
-	                          c = *ventura::absolute_path::create(absolute_root + "c"),
-	                          c2 = *ventura::absolute_path::create(absolute_root + "c");
-	BOOST_CHECK_EQUAL(a, a);
-	BOOST_CHECK_EQUAL(b, b);
-	BOOST_CHECK_EQUAL(c, c);
-	BOOST_CHECK_EQUAL(c, c2);
-	BOOST_CHECK_EQUAL(c2, c);
-	BOOST_CHECK_NE(a, b);
-	BOOST_CHECK_NE(a, c);
-	BOOST_CHECK_NE(b, c);
-	BOOST_CHECK_NE(b, a);
-	BOOST_CHECK_NE(c, b);
-	BOOST_CHECK_NE(c, a);
+    ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b"),
+                              c = *ventura::absolute_path::create(absolute_root + "c"),
+                              c2 = *ventura::absolute_path::create(absolute_root + "c");
+    BOOST_CHECK_EQUAL(a, a);
+    BOOST_CHECK_EQUAL(b, b);
+    BOOST_CHECK_EQUAL(c, c);
+    BOOST_CHECK_EQUAL(c, c2);
+    BOOST_CHECK_EQUAL(c2, c);
+    BOOST_CHECK_NE(a, b);
+    BOOST_CHECK_NE(a, c);
+    BOOST_CHECK_NE(b, c);
+    BOOST_CHECK_NE(b, a);
+    BOOST_CHECK_NE(c, b);
+    BOOST_CHECK_NE(c, a);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_equality_with_other_types)
 {
-	ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b");
-	BOOST_CHECK_EQUAL(a, "");
-	BOOST_CHECK_EQUAL(a, boost::filesystem::path());
-	BOOST_CHECK(b == absolute_root + "b");
-	BOOST_CHECK(b == boost::filesystem::path((absolute_root + "b").c_str()));
-	BOOST_CHECK_NE(a, "x");
-	BOOST_CHECK_NE(a, boost::filesystem::path("x"));
+    ventura::absolute_path a, b = *ventura::absolute_path::create(absolute_root + "b");
+    BOOST_CHECK_EQUAL(a, "");
+    BOOST_CHECK_EQUAL(a, boost::filesystem::path());
+    BOOST_CHECK(b == absolute_root + "b");
+    BOOST_CHECK(b == boost::filesystem::path((absolute_root + "b").c_str()));
+    BOOST_CHECK_NE(a, "x");
+    BOOST_CHECK_NE(a, boost::filesystem::path("x"));
 }
 
 namespace
 {
-	template <class Map>
-	void test_map(Map &m)
-	{
-		m[*ventura::absolute_path::create(absolute_root + "a")] = 1;
-		m[*ventura::absolute_path::create(absolute_root + "b")] = 2;
-		m[*ventura::absolute_path::create(absolute_root + "c")] = 3;
-		BOOST_CHECK_EQUAL(3u, m.size());
-		BOOST_CHECK_EQUAL(1, m[*ventura::absolute_path::create(absolute_root + "a")]);
-		BOOST_CHECK_EQUAL(2, m[*ventura::absolute_path::create(absolute_root + "b")]);
-		BOOST_CHECK_EQUAL(3, m[*ventura::absolute_path::create(absolute_root + "c")]);
-	}
+    template <class Map>
+    void test_map(Map &m)
+    {
+        m[*ventura::absolute_path::create(absolute_root + "a")] = 1;
+        m[*ventura::absolute_path::create(absolute_root + "b")] = 2;
+        m[*ventura::absolute_path::create(absolute_root + "c")] = 3;
+        BOOST_CHECK_EQUAL(3u, m.size());
+        BOOST_CHECK_EQUAL(1, m[*ventura::absolute_path::create(absolute_root + "a")]);
+        BOOST_CHECK_EQUAL(2, m[*ventura::absolute_path::create(absolute_root + "b")]);
+        BOOST_CHECK_EQUAL(3, m[*ventura::absolute_path::create(absolute_root + "c")]);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_less_than)
 {
-	std::map<ventura::absolute_path, int> m;
-	test_map(m);
+    std::map<ventura::absolute_path, int> m;
+    test_map(m);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_std_hash)
 {
-	std::unordered_map<ventura::absolute_path, int> m;
-	test_map(m);
+    std::unordered_map<ventura::absolute_path, int> m;
+    test_map(m);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_boost_hash)
 {
-	boost::unordered_map<ventura::absolute_path, int> m;
-	test_map(m);
+    boost::unordered_map<ventura::absolute_path, int> m;
+    test_map(m);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_combine)
 {
-	BOOST_CHECK_EQUAL(*ventura::absolute_path::create(absolute_root + "a/b"),
-	                  *ventura::absolute_path::create(absolute_root + "a") / ventura::relative_path("b"));
+    BOOST_CHECK_EQUAL(*ventura::absolute_path::create(absolute_root + "a/b"),
+                      *ventura::absolute_path::create(absolute_root + "a") / ventura::relative_path("b"));
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_c_str_empty)
 {
-	ventura::absolute_path p;
-	char const *c_str = p.c_str();
-	BOOST_CHECK(std::string("") == c_str);
+    ventura::absolute_path p;
+    char const *c_str = p.c_str();
+    BOOST_CHECK(std::string("") == c_str);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_c_str_non_empty)
 {
-	ventura::absolute_path p = *ventura::absolute_path::create(absolute_root);
-	char const *c_str = p.c_str();
-	BOOST_CHECK(absolute_root == c_str);
+    ventura::absolute_path p = *ventura::absolute_path::create(absolute_root);
+    char const *c_str = p.c_str();
+    BOOST_CHECK(absolute_root == c_str);
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_safe_c_str_empty)
 {
-	ventura::absolute_path p;
-	Si::c_string const str = p.safe_c_str();
-	BOOST_CHECK(std::string("") == str.c_str());
+    ventura::absolute_path p;
+    Si::c_string const str = p.safe_c_str();
+    BOOST_CHECK(std::string("") == str.c_str());
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_safe_c_str_non_empty)
 {
-	ventura::absolute_path p = *ventura::absolute_path::create(absolute_root);
-	Si::c_string const str = p.safe_c_str();
-	BOOST_CHECK(absolute_root == str.c_str());
+    ventura::absolute_path p = *ventura::absolute_path::create(absolute_root);
+    Si::c_string const str = p.safe_c_str();
+    BOOST_CHECK(absolute_root == str.c_str());
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_create_literal_ok)
 {
-	Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(SILICIUM_TEST_ROOT);
-	BOOST_REQUIRE(p);
-	BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
+    Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(SILICIUM_TEST_ROOT);
+    BOOST_REQUIRE(p);
+    BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_create_literal_not_ok)
 {
-	Si::optional<ventura::absolute_path> p = ventura::absolute_path::create("not root");
-	BOOST_CHECK(!p);
+    Si::optional<ventura::absolute_path> p = ventura::absolute_path::create("not root");
+    BOOST_CHECK(!p);
 }
 
 #ifndef _WIN32
 BOOST_AUTO_TEST_CASE(absolute_path_create_noexcept_string_ok)
 {
-	Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(Si::noexcept_string(SILICIUM_TEST_ROOT));
-	BOOST_REQUIRE(p);
-	BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
+    Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(Si::noexcept_string(SILICIUM_TEST_ROOT));
+    BOOST_REQUIRE(p);
+    BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_create_noexcept_string_not_ok)
 {
-	Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(Si::noexcept_string("not root"));
-	BOOST_CHECK(!p);
+    Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(Si::noexcept_string("not root"));
+    BOOST_CHECK(!p);
 }
 #endif
 
 BOOST_AUTO_TEST_CASE(absolute_path_create_boost_path_ok)
 {
-	Si::optional<ventura::absolute_path> p =
-	    ventura::absolute_path::create(boost::filesystem::path(SILICIUM_TEST_ROOT));
-	BOOST_REQUIRE(p);
-	BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
+    Si::optional<ventura::absolute_path> p =
+        ventura::absolute_path::create(boost::filesystem::path(SILICIUM_TEST_ROOT));
+    BOOST_REQUIRE(p);
+    BOOST_CHECK_EQUAL(SILICIUM_TEST_ROOT, p->to_boost_path());
 }
 
 BOOST_AUTO_TEST_CASE(absolute_path_create_boost_path_not_ok)
 {
-	Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(boost::filesystem::path("not root"));
-	BOOST_CHECK(!p);
+    Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(boost::filesystem::path("not root"));
+    BOOST_CHECK(!p);
 }
 
 #ifdef _WIN32
 BOOST_AUTO_TEST_CASE(absolute_path_create_wchar_not_ok)
 {
-	Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(L"not root");
-	BOOST_CHECK(!p);
+    Si::optional<ventura::absolute_path> p = ventura::absolute_path::create(L"not root");
+    BOOST_CHECK(!p);
 }
 #endif

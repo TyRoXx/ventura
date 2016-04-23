@@ -3,13 +3,13 @@
 
 namespace ventura
 {
-	typedef
+    typedef
 #ifdef _WIN32
-	    wchar_t
+        wchar_t
 #else
-	    char
+        char
 #endif
-	        native_path_char;
+            native_path_char;
 }
 
 #endif

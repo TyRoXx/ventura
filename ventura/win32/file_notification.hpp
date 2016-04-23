@@ -6,25 +6,25 @@
 
 namespace ventura
 {
-	namespace win32
-	{
-		struct file_notification
-		{
-			DWORD action;
-			relative_path name;
+    namespace win32
+    {
+        struct file_notification
+        {
+            DWORD action;
+            relative_path name;
 
-			file_notification()
-			    : action(0)
-			{
-			}
+            file_notification()
+                : action(0)
+            {
+            }
 
-			file_notification(DWORD action, relative_path name)
-			    : action(action)
-			    , name(std::move(name))
-			{
-			}
-		};
-	}
+            file_notification(DWORD action, relative_path name)
+                : action(action)
+                , name(std::move(name))
+            {
+            }
+        };
+    }
 }
 
 #endif

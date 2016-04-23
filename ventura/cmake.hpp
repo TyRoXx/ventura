@@ -5,13 +5,13 @@
 
 namespace ventura
 {
-	absolute_path const cmake_exe = *absolute_path::create(
+    absolute_path const cmake_exe = *absolute_path::create(
 #ifdef _WIN32
-	    L"C:\\Program Files (x86)\\CMake\\bin\\cmake.exe"
+        L"C:\\Program Files (x86)\\CMake\\bin\\cmake.exe"
 #else
-	    "/usr/bin/cmake"
+        "/usr/bin/cmake"
 #endif
-	    );
+        );
 }
 
 #endif
