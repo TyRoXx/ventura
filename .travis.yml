@@ -28,7 +28,7 @@ env:
  - CPP=g++-4.6 GCC=gcc-4.6 CONAN="-s compiler.version=4.6" BUILD_TYPE=Release
 
 install:
- - wget https://s3-eu-west-1.amazonaws.com/conanio-production/downloads/conan-ubuntu-64_0_8_4.deb -O conan.deb || exit 1
+ - wget https://s3-eu-west-1.amazonaws.com/conanio-production/downloads/conan-ubuntu-64_0_9_2.deb -O conan.deb || exit 1
  - sudo dpkg -i conan.deb || exit 1
  - rm conan.deb || exit 1
  - conan --version
