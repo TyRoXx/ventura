@@ -5,7 +5,6 @@
 #include <boost/thread/thread.hpp>
 #include <silicium/asio/posting_observable.hpp>
 #include <silicium/observable/ref.hpp>
-#include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/os_string.hpp>
 #include <silicium/pipe.hpp>

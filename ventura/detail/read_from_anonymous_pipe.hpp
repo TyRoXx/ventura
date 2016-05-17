@@ -5,8 +5,10 @@
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/observable/thread.hpp>
 #include <silicium/sink/buffering_sink.hpp>
+#include <silicium/observable/spawn_coroutine.hpp>
 #include <boost/thread/future.hpp>
 #include <silicium/make_unique.hpp>
+#include <silicium/optional.hpp>
 
 namespace ventura
 {
@@ -129,7 +131,7 @@ namespace ventura
                 void start()
                 {
                     auto this_ = this->shared_from_this();
-                    m_output.async_get_one(Si::make_function_observer([this_](optional<error_or<memory_range>> piece)
+                    m_output.async_get_one(Si::make_function_observer([this_](Si::optional<Si::error_or<Si::memory_range>> piece)
                                                                       {
                                                                           assert(piece);
                                                                           if (piece->is_error())
