@@ -4,22 +4,19 @@
 #include <boost/thread/future.hpp>
 #include <boost/thread/thread.hpp>
 #include <silicium/asio/posting_observable.hpp>
-#include <silicium/asio/process_output.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/observable/ref.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <silicium/observable/spawn_observable.hpp>
 #include <silicium/observable/thread.hpp>
-#include <silicium/observable/virtualized.hpp>
 #include <silicium/os_string.hpp>
 #include <silicium/pipe.hpp>
-#include <silicium/process_handle.hpp>
 #include <silicium/sink/append.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <silicium/std_threading.hpp>
 #include <ventura/absolute_path.hpp>
-#include <ventura/absolute_path.hpp>
 #include <ventura/process_parameters.hpp>
+#include <ventura/process_handle.hpp>
 
 #if SILICIUM_HAS_EXCEPTIONS
 #include <boost/filesystem/operations.hpp>
@@ -51,7 +48,7 @@ namespace ventura
 
     struct async_process
     {
-        Si::process_handle process;
+        process_handle process;
 #ifndef _WIN32
         Si::file_handle child_error;
 #endif
@@ -61,11 +58,11 @@ namespace ventura
         }
 
 #ifdef _WIN32
-        explicit async_process(Si::process_handle process) BOOST_NOEXCEPT : process(std::move(process))
+        explicit async_process(process_handle process) BOOST_NOEXCEPT : process(std::move(process))
         {
         }
 #else
-        explicit async_process(Si::process_handle process, Si::file_handle child_error) BOOST_NOEXCEPT
+        explicit async_process(process_handle process, Si::file_handle child_error) BOOST_NOEXCEPT
             : process(std::move(process)),
               child_error(std::move(child_error))
         {
@@ -274,7 +271,7 @@ namespace ventura
         }
 
         Si::win32::unique_handle thread_closer(process.hThread);
-        Si::process_handle process_closer(process.hProcess);
+        process_handle process_closer(process.hProcess);
         return async_process(std::move(process_closer));
     }
 #else
@@ -417,7 +414,7 @@ namespace ventura
         // parent
         else
         {
-            return async_process(Si::process_handle(forked), std::move(child_error.read));
+            return async_process(process_handle(forked), std::move(child_error.read));
         }
     }
 #endif
