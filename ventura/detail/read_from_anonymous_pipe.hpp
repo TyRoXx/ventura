@@ -2,9 +2,11 @@
 #define VENTURA_READ_FROM_ANONYMOUS_PIPE_HPP
 
 #include <silicium/asio/process_output.hpp>
+#include <silicium/observable/function_observer.hpp>
 #include <silicium/observable/thread.hpp>
 #include <silicium/sink/buffering_sink.hpp>
 #include <boost/thread/future.hpp>
+#include <silicium/make_unique.hpp>
 
 namespace ventura
 {
