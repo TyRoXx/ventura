@@ -5,10 +5,13 @@
 #include <silicium/observable/function_observer.hpp>
 #include <silicium/observable/thread.hpp>
 #include <silicium/sink/buffering_sink.hpp>
+#include <silicium/sink/append.hpp>
 #include <silicium/observable/spawn_coroutine.hpp>
 #include <boost/thread/future.hpp>
 #include <silicium/make_unique.hpp>
 #include <silicium/optional.hpp>
+#include <silicium/to_shared.hpp>
+#include <silicium/observable/ref.hpp>
 
 namespace ventura
 {
