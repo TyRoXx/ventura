@@ -3,6 +3,7 @@
 
 #include <boost/thread/future.hpp>
 #include <boost/thread/thread.hpp>
+#include <silicium/asio/process_output.hpp>
 #include <silicium/asio/posting_observable.hpp>
 #include <silicium/file_handle.hpp>
 #include <silicium/observable/ref.hpp>
