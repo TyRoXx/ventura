@@ -37,8 +37,8 @@ namespace
 
         for (auto const &variable : additional_variables)
         {
-            BOOST_CHECK_NE(std::string::npos,
-                           output.find(Si::to_utf8_string(variable.first) + '=' + Si::to_utf8_string(variable.second)));
+            auto const needle = Si::to_utf8_string(variable.first) + '=' + Si::to_utf8_string(variable.second);
+            BOOST_CHECK(std::search(output.begin(), output.end(), needle.begin(), needle.end()) != output.end());
         }
 
         auto const parent_key_found = output.find("silicium_parent_key=parent_value");

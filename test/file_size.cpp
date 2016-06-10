@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(file_size_non_empty)
         ventura::file_sink sink(handle.handle);
         Si::append(sink, ventura::file_sink::element_type{Si::make_c_str_range("Test")});
     }
-    BOOST_CHECK_EQUAL(Si::make_optional<boost::uintmax_t>(4), ventura::file_size(handle.handle).get());
+    BOOST_CHECK_EQUAL(Si::make_optional<boost::uint64_t>(4), ventura::file_size(handle.handle).get());
 }
 #endif
 

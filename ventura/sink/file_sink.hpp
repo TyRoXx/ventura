@@ -7,18 +7,16 @@
 #include <silicium/file_handle.hpp>
 #include <silicium/memory_range.hpp>
 #include <ventura/flush.hpp>
+#include <ventura/file_operations.hpp>
 
 #ifdef _WIN32
 #include <silicium/win32/win32.hpp>
 #else
 #include <sys/uio.h>
+#include <unistd.h>
 #endif
 
-#ifdef __APPLE__
-#define VENTURA_HAS_FILE_SINK 0
-#else
 #define VENTURA_HAS_FILE_SINK SILICIUM_HAS_VARIANT
-#endif
 
 namespace ventura
 {
@@ -175,36 +173,44 @@ namespace ventura
 
         error_type append_one(element_type const &element)
         {
-            return Si::visit<error_type>(
-                element,
-                [this](flush) -> error_type
-                {
-                    if (fdatasync(m_destination) == 0)
-                    {
-                        return error_type();
-                    }
-                    return Si::get_last_error();
-                },
-                [this](Si::memory_range const &content) -> error_type
-                {
-                    return write_piece(content);
-                },
-                [this](seek_set const request) -> error_type
-                {
-                    if (lseek64(m_destination, request.from_beginning, SEEK_SET) == static_cast<off_t>(-1))
-                    {
-                        return Si::get_last_error();
-                    }
-                    return error_type();
-                },
-                [this](seek_add const request) -> error_type
-                {
-                    if (lseek64(m_destination, request.from_current, SEEK_CUR) == static_cast<off_t>(-1))
-                    {
-                        return Si::get_last_error();
-                    }
-                    return error_type();
-                });
+            return Si::visit<error_type>(element,
+                                         [this](flush) -> error_type
+                                         {
+                                             if (
+#ifdef __APPLE__
+                                                 fsync
+#else
+                                                 fdatasync
+#endif
+                                                 (m_destination) == 0)
+                                             {
+                                                 return error_type();
+                                             }
+                                             return Si::get_last_error();
+                                         },
+                                         [this](Si::memory_range const &content) -> error_type
+                                         {
+                                             return write_piece(content);
+                                         },
+                                         [this](seek_set const request) -> error_type
+                                         {
+                                             return seek_absolute(m_destination, request.from_beginning);
+                                         },
+                                         [this](seek_add const request) -> error_type
+                                         {
+                                             if (
+#ifdef __APPLE__
+                                                 lseek
+#else
+                                                 lseek64
+#endif
+                                                 (m_destination, request.from_current, SEEK_CUR) ==
+                                                 static_cast<off_t>(-1))
+                                             {
+                                                 return Si::get_last_error();
+                                             }
+                                             return error_type();
+                                         });
         }
 
         error_type write_piece(Si::memory_range const &content)
@@ -219,12 +225,12 @@ namespace ventura
 
         error_type write_vector(element_type const *begin, element_type const *end)
         {
-            std::vector<iovec> vector(std::distance(begin, end));
+            std::vector<iovec> vector(static_cast<std::size_t>(std::distance(begin, end)));
             for (size_t i = 0; i < vector.size(); ++i, ++begin)
             {
                 Si::memory_range const &piece = *Si::try_get_ptr<Si::memory_range>(*begin);
                 vector[i].iov_base = const_cast<void *>(static_cast<void const *>(piece.begin()));
-                vector[i].iov_len = piece.size();
+                vector[i].iov_len = static_cast<std::size_t>(piece.size());
             }
             assert(vector.size() <= static_cast<size_t>((std::numeric_limits<int>::max)()));
             ssize_t rc = ::writev(m_destination, vector.data(), static_cast<int>(vector.size()));

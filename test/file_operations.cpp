@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(test_cursor_position)
     BOOST_REQUIRE_EQUAL(10u, ventura::cursor_position(file.handle).get());
     Si::throw_if_error(ventura::seek_absolute(file.handle, 4));
     BOOST_REQUIRE_EQUAL(4u, ventura::cursor_position(file.handle).get());
-    Si::write(file.handle, Si::make_c_str_range("abc"));
+    Si::write(file.handle, Si::make_c_str_range("abc")).get();
     BOOST_REQUIRE_EQUAL(7u, ventura::cursor_position(file.handle).get());
     Si::throw_if_error(ventura::seek_absolute(file.handle, 0));
     std::vector<char> const content = ventura::read_file(file.handle).get();

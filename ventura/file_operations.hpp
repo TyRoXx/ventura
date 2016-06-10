@@ -381,7 +381,11 @@ namespace ventura
             return Si::get_last_error();
         }
 #else
-        auto position = lseek(file, destination, SEEK_SET);
+        if (destination > (std::numeric_limits<off_t>::max)())
+        {
+            return boost::system::error_code(EINVAL, boost::system::native_ecat);
+        }
+        auto const position = lseek(file, static_cast<off_t>(destination), SEEK_SET);
         if (static_cast<boost::uint64_t>(position) != destination)
         {
             return Si::get_last_error();
