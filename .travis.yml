@@ -12,13 +12,10 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - g++-5
     - g++-4.9
     - g++-4.8
     
 env:
- - CPP=g++-5   GCC=gcc-5   CONAN="-s compiler.version=5.4" BUILD_TYPE=Release
- - CPP=g++-5   GCC=gcc-5   CONAN="-s compiler.version=5.4" BUILD_TYPE=Debug
  - CPP=g++-4.9 GCC=gcc-4.9 CONAN="-s compiler.version=4.9" BUILD_TYPE=Release
  - CPP=g++-4.9 GCC=gcc-4.9 CONAN="-s compiler.version=4.9" BUILD_TYPE=Debug
  - CPP=g++-4.8 GCC=gcc-4.8 CONAN="-s compiler.version=4.8" BUILD_TYPE=Release
