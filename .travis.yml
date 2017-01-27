@@ -14,15 +14,18 @@ addons:
     packages:
     - g++-4.9
     - g++-4.8
+    - g++-5
     
 env:
+ - CPP=g++-5   GCC=gcc-5   CONAN="-s compiler.version=5.4" BUILD_TYPE=Release
+ - CPP=g++-5   GCC=gcc-5   CONAN="-s compiler.version=5.4" BUILD_TYPE=Debug
  - CPP=g++-4.9 GCC=gcc-4.9 CONAN="-s compiler.version=4.9" BUILD_TYPE=Release
  - CPP=g++-4.9 GCC=gcc-4.9 CONAN="-s compiler.version=4.9" BUILD_TYPE=Debug
  - CPP=g++-4.8 GCC=gcc-4.8 CONAN="-s compiler.version=4.8" BUILD_TYPE=Release
  - CPP=g++-4.8 GCC=gcc-4.8 CONAN="-s compiler.version=4.8" BUILD_TYPE=Debug
 
 install:
- - wget https://s3-eu-west-1.amazonaws.com/conanio-production/downloads/conan-ubuntu-64_0_9_2.deb -O conan.deb || exit 1
+ - wget https://github.com/conan-io/conan/releases/download/0.18.1/conan-ubuntu-64_0_18_1.deb -O conan.deb || exit 1
  - sudo dpkg -i conan.deb || exit 1
  - rm conan.deb || exit 1
  - conan --version
