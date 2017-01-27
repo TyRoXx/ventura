@@ -2,6 +2,7 @@
 #define VENTURA_RUN_PROCESS_HPP
 
 #include <ventura/async_process.hpp>
+#include <ventura/detail/read_from_anonymous_pipe.hpp>
 #include <silicium/write.hpp>
 #include <silicium/sink/multi_sink.hpp>
 #include <silicium/sink/iterator_sink.hpp>
@@ -9,6 +10,8 @@
 #include <silicium/source/range_source.hpp>
 #include <silicium/source/transforming_source.hpp>
 #include <boost/range/algorithm/transform.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/thread/future.hpp>
 
 namespace ventura
 {
@@ -24,8 +27,7 @@ namespace ventura
     }
 }
 
-#define VENTURA_HAS_RUN_PROCESS                                                                                        \
-    (SILICIUM_HAS_EXCEPTIONS && VENTURA_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE && VENTURA_HAS_LAUNCH_PROCESS)
+#define VENTURA_HAS_RUN_PROCESS (SILICIUM_HAS_EXCEPTIONS && VENTURA_HAS_LAUNCH_PROCESS)
 
 #if VENTURA_HAS_RUN_PROCESS
 #include <future>

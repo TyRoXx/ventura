@@ -1,11 +1,7 @@
 #ifndef VENTURA_ASYNC_PROCESS_HPP
 #define VENTURA_ASYNC_PROCESS_HPP
 
-#include <ventura/detail/read_from_anonymous_pipe.hpp>
 #include <boost/thread/thread.hpp>
-#include <silicium/asio/posting_observable.hpp>
-#include <silicium/observable/ref.hpp>
-#include <silicium/observable/spawn_observable.hpp>
 #include <silicium/os_string.hpp>
 #include <silicium/pipe.hpp>
 #include <silicium/sink/append.hpp>

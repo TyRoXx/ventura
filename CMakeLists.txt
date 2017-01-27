@@ -80,6 +80,7 @@ endif()
 
 set(conanbuildinfo ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 if(EXISTS ${conanbuildinfo})
+	set(CONAN_SYSTEM_INCLUDES ON)
 	include(${conanbuildinfo})
 	conan_basic_setup()
 else()
