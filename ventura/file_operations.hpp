@@ -138,7 +138,8 @@ namespace ventura
 #endif
     {
         boost::system::error_code ec;
-        boost::filesystem::copy(from.to_boost_path(), to.to_boost_path(), ec);
+        boost::filesystem::copy_file(from.to_boost_path(), to.to_boost_path(),
+                                     boost::filesystem::copy_option::overwrite_if_exists, ec);
         return std::forward<ErrorHandler>(handle_error)(ec, Si::identity<void>());
     }
 

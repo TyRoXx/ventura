@@ -214,4 +214,30 @@ BOOST_AUTO_TEST_CASE(test_cursor_position)
     std::string const expected = "0123abc789";
     BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), content.begin(), content.end());
 }
+
+BOOST_AUTO_TEST_CASE(test_copy)
+{
+    auto to = ventura::temporary_directory(Si::throw_) / ventura::relative_path("to.txt");
+    auto from = ventura::temporary_directory(Si::throw_) / ventura::relative_path("from.txt");
+    Si::throw_if_error(
+        ventura::write_file(ventura::safe_c_str(ventura::to_native_range(from)), Si::make_c_str_range("new")));
+    ventura::copy(from, to, Si::throw_);
+    auto written = ventura::read_file(to).get();
+    std::string const expected("new");
+    BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), written.begin(), written.end());
+}
+
+BOOST_AUTO_TEST_CASE(test_copy_exists)
+{
+    auto to = ventura::temporary_directory(Si::throw_) / ventura::relative_path("to.txt");
+    Si::throw_if_error(
+        ventura::write_file(ventura::safe_c_str(ventura::to_native_range(to)), Si::make_c_str_range("old")));
+    auto from = ventura::temporary_directory(Si::throw_) / ventura::relative_path("from.txt");
+    Si::throw_if_error(
+        ventura::write_file(ventura::safe_c_str(ventura::to_native_range(from)), Si::make_c_str_range("new")));
+    ventura::copy(from, to, Si::throw_);
+    auto written = ventura::read_file(to).get();
+    std::string const expected("new");
+    BOOST_CHECK_EQUAL_COLLECTIONS(expected.begin(), expected.end(), written.begin(), written.end());
+}
 #endif
