@@ -71,6 +71,8 @@ namespace ventura
     namespace experimental
     {
 #if VENTURA_HAS_EXPERIMENTAL_READ_FROM_ANONYMOUS_PIPE
+
+#ifndef _WIN32
         struct pipe_reading_state
         {
             boost::asio::posix::stream_descriptor reader;
@@ -83,7 +85,7 @@ namespace ventura
         };
 
         template <class CharSink>
-        void read_all(std::shared_ptr<pipe_reading_state> state, CharSink &&destination)
+        void read_all(std::shared_ptr<pipe_reading_state> state, CharSink &destination)
         {
             state->reader.async_read_some(
                 boost::asio::buffer(state->buffer), [state, &destination](boost::system::error_code ec, size_t bytes)
@@ -97,18 +99,27 @@ namespace ventura
                     read_all(state, destination);
                 });
         }
+#endif
 
         // TODO: find a more generic API for reading from a pipe portably
         template <class CharSink>
-        boost::unique_future<void> read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &&destination,
+        boost::unique_future<void> read_from_anonymous_pipe(boost::asio::io_service &io, CharSink &destination,
                                                             Si::file_handle file,
                                                             boost::shared_future<void> stop_polling)
         {
+#ifdef _WIN32
+            return boost::async(boost::launch::async, [&io, file = std::move(file), stop_polling, &destination ]()
+                                {
+                                    boost::asio::io_service::work work(io);
+                                    win32::copy_whole_pipe(file.handle, destination, stop_polling);
+                                });
+#else
             // TODO: implement for Windows
             (void)stop_polling;
             auto state = std::make_shared<pipe_reading_state>(io, std::move(file));
             read_all(state, destination);
             return boost::make_ready_future();
+#endif
         }
 #endif
     }
